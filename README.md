@@ -1,6 +1,6 @@
 # LinkedIn Scraping with Python
 
-Creates automatically an Excel file containing the personal data and the last job position of all the provided LinkedIn profiles.
+Creates an Excel file containing the personal data and the last job position of all the provided LinkedIn profiles.
 
 ## Getting Started
 
