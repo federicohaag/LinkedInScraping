@@ -24,15 +24,15 @@ pip install -r requirements.txt
  
 When the installation ends, open the directory `LinkedinScraping` and follow the instructions based on your OS:
 
-####MacOS
+#### MacOS
 1. Rename the file `configs-mac.txt` into `configs.txt`
 2. Open such file and overwrite `username` with your LinkedIn username, and overwrite `password` with your LinkedIn password
 3. Save & Close the file
-####Windows
+#### Windows
 1. Rename the file `configs-windows.txt` into `configs.txt`
 2. Open such file and overwrite `username` with your LinkedIn username, and overwrite `password` with your LinkedIn password
 3. Save & Close the file
-####Linux
+#### Linux
 1. Rename the file `configs-linux.txt` into `configs.txt`
 2. Open such file and overwrite `username` with your LinkedIn username, and overwrite `password` with your LinkedIn password
 3. Save & Close the file
