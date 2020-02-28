@@ -1,0 +1,11 @@
+username
+password
+MacOS/chromedriver
+
+= = = = = = = = = = = = = = = =
+
+If you have an account with username 'bob' and password 'secret', the first three lines of this file should be as follows:
+
+bob
+secret
+MacOS/chromedriver

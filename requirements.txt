@@ -1,0 +1,4 @@
+xlsxwriter
+bs4
+selenium
+lxml
