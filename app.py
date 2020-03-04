@@ -82,8 +82,16 @@ def get_profile_data(link_linkedin_profile):
         if span.get_text().strip() == 'Location':
             next_span_is_location = True
 
+    # Scraping of Industry
+    company_url = a_tags.get('href')
+    try:
+        browser.get('https://www.linkedin.com'+company_url)
+        industry = browser.execute_script("return document.getElementsByClassName('org-top-card-summary-info-list__info-item')[0].innerText")
+    except:
+        industry = 'N/A'
+
     # Returning of the data
-    return [profile_name, email, [company_name, job_title, location]]
+    return [profile_name, email, [company_name, job_title, location, industry]]
 
 
 # Loading of configurations
@@ -107,7 +115,10 @@ username_input.send_keys(username)
 
 password_input = browser.find_element_by_id('password')
 password_input.send_keys(password)
-password_input.submit()
+try:
+    password_input.submit()
+except:
+    pass
 
 # Loading of Profiles data - see: get_profile_data()
 profiles_data = []
@@ -119,9 +130,9 @@ for profile_link in open("profiles.txt", "r"):
         try:
             profiles_data.append(get_profile_data(profile_link))
         except:
-            profiles_data.append(['', '', ['', '', '']])
+            profiles_data.append(['', '', ['', '', '', '']])
     else:
-        profiles_data.append(['BAD FORMATTED LINK', '', ['', '', '']])
+        profiles_data.append(['BAD FORMATTED LINK', '', ['', '', '', '']])
 
 # Closing of Chrome
 browser.quit()
@@ -130,7 +141,7 @@ browser.quit()
 workbook = xlsxwriter.Workbook('results.xlsx')
 worksheet = workbook.add_worksheet()
 
-headers = ['Name', 'Company', 'Job Title', 'Location', 'Email']
+headers = ['Name', 'Company', 'Job Title', 'Location', 'Industry', 'Email']
 for h in range(len(headers)):
     worksheet.write(0, h, headers[h])
 
@@ -143,6 +154,7 @@ for i in range(len(profiles_data)):
     worksheet.write(xls_row, 1, profile_data[2][0])
     worksheet.write(xls_row, 2, profile_data[2][1])
     worksheet.write(xls_row, 3, profile_data[2][2])
-    worksheet.write(xls_row, 4, profile_data[1])
+    worksheet.write(xls_row, 4, profile_data[2][3])
+    worksheet.write(xls_row, 5, profile_data[1])
 
 workbook.close()
