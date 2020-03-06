@@ -40,7 +40,7 @@ When the installation ends, open the directory `LinkedinScraping` and follow the
 
 ## Running
 
-Open the `profiles.txt` file and insert the URLs of the LinkedIn profiles you want to do the scraping.
+Open the `profiles_data.txt` file and insert the URLs of the LinkedIn profiles you want to do the scraping.
 For example:
 ```
 https://www.linkedin.com/in/federicohaag/
@@ -48,7 +48,7 @@ https://www.linkedin.com/in/someoneelse/
 ```
 **Notice:** Each line must contain **only one** URL
 
-Run `scrap_profiles_by_url.py`.
+Run `scrap_profiles.py`.
 
 **Important:** A new Google Chrome window will be opened. Please don't lose the focus on it. You can leave the computer but be sure it won't go to sleep mode (for MacOS: [Amphetamine](https://apps.apple.com/it/app/amphetamine/id937984704?mt=12)).
 
