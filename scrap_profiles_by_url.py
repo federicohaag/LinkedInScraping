@@ -105,7 +105,7 @@ linkedin_login(browser, username, password)
 
 # Loading of Profiles data - see: get_profile_data()
 profiles_data = []
-for profile_link in open("profiles.txt", "r"):
+for profile_link in open("profiles_urls.txt", "r"):
     if profile_link == '':
         continue
 

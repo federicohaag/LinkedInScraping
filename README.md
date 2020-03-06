@@ -48,7 +48,7 @@ https://www.linkedin.com/in/someoneelse/
 ```
 **Notice:** Each line must contain **only one** URL
 
-Run `app.py`.
+Run `scrap_profiles_by_url.py`.
 
 **Important:** A new Google Chrome window will be opened. Please don't lose the focus on it. You can leave the computer but be sure it won't go to sleep mode (for MacOS: [Amphetamine](https://apps.apple.com/it/app/amphetamine/id937984704?mt=12)).
 
