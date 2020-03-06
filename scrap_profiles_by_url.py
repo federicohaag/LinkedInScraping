@@ -1,20 +1,7 @@
-import os
 import time
-import re
 import xlsxwriter
 from bs4 import BeautifulSoup
-from selenium import webdriver
-
-
-def check_url(url):
-    regex = re.compile(
-        r'^(?:http|ftp)s?://'  # http:// or https://
-        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
-        r'localhost|'  # localhost...
-        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
-        r'(?::\d+)?'  # optional port
-        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-    return re.match(regex, url) is not None
+from utils import linkedin_login, linkedin_logout, load_configurations, check_url
 
 
 def get_profile_data(link_linkedin_profile):
@@ -82,6 +69,17 @@ def get_profile_data(link_linkedin_profile):
         if span.get_text().strip() == 'Location':
             next_span_is_location = True
 
+    # Parse of Location ==> splitting it in City and Country
+    city = 'N/A'
+    country = 'N/A'
+    if len(location) > 2:
+        if ',' in location:
+            city = location.split(',')[0]
+            country = location.split(',')[-1]
+        else:
+            city = ''
+            country = ''
+
     # Scraping of Industry
     company_url = a_tags.get('href')
     try:
@@ -91,34 +89,19 @@ def get_profile_data(link_linkedin_profile):
         industry = 'N/A'
 
     # Returning of the data
-    return [profile_name, email, [company_name, job_title, location, industry]]
+    return get_profile_result(profile_name, email, company_name, job_title, city, country, location, industry)
+
+
+def get_profile_result(profile_name='', email='', company_name='', job_title='', city='', country='', location='', industry=''):
+
+    return [profile_name, email, [company_name, job_title, [city, country, location], industry]]
 
 
 # Loading of configurations
-configurations = open('configs.txt', 'r')
-username = configurations.readline()
-password = configurations.readline()
-driver = configurations.readline()
-configurations.close()
-
-# Building of the path to Chrome driver executable file
-driver_bin = os.path.join(os.path.abspath(os.path.dirname(__file__)), driver)
-
-# Creation of a new instance of Chrome
-browser = webdriver.Chrome(executable_path=driver_bin)
+username, password, browser = load_configurations()
 
 # Doing login on Linkedin
-browser.get('https://www.linkedin.com/uas/login')
-
-username_input = browser.find_element_by_id('username')
-username_input.send_keys(username)
-
-password_input = browser.find_element_by_id('password')
-password_input.send_keys(password)
-try:
-    password_input.submit()
-except:
-    pass
+linkedin_login(browser, username, password)
 
 # Loading of Profiles data - see: get_profile_data()
 profiles_data = []
@@ -130,18 +113,22 @@ for profile_link in open("profiles.txt", "r"):
         try:
             profiles_data.append(get_profile_data(profile_link))
         except:
-            profiles_data.append(['', '', ['', '', '', '']])
+            profiles_data.append(get_profile_result())
     else:
-        profiles_data.append(['BAD FORMATTED LINK', '', ['', '', '', '']])
+        profiles_data.append(get_profile_result('BAD FORMATTED LINK'))
+
+    if len(profiles_data) % 100 == 0:
+        linkedin_logout(browser)
+        linkedin_login(browser, username, password)
 
 # Closing of Chrome
 browser.quit()
 
 # Generation of XLS file with profiles data
-workbook = xlsxwriter.Workbook('results.xlsx')
+workbook = xlsxwriter.Workbook('results_profiles_by_url.xlsx')
 worksheet = workbook.add_worksheet()
 
-headers = ['Name', 'Company', 'Job Title', 'Location', 'Industry', 'Email']
+headers = ['Name', 'Email', 'Company', 'Job Title', 'City', 'Country', 'Full Location', 'Industry']
 for h in range(len(headers)):
     worksheet.write(0, h, headers[h])
 
@@ -151,10 +138,12 @@ for i in range(len(profiles_data)):
 
     # Mapping of profile data based on previous declared headers
     worksheet.write(xls_row, 0, profile_data[0])
-    worksheet.write(xls_row, 1, profile_data[2][0])
-    worksheet.write(xls_row, 2, profile_data[2][1])
-    worksheet.write(xls_row, 3, profile_data[2][2])
-    worksheet.write(xls_row, 4, profile_data[2][3])
-    worksheet.write(xls_row, 5, profile_data[1])
+    worksheet.write(xls_row, 1, profile_data[1])
+    worksheet.write(xls_row, 2, profile_data[2][0])
+    worksheet.write(xls_row, 3, profile_data[2][1])
+    worksheet.write(xls_row, 4, profile_data[2][2][0])
+    worksheet.write(xls_row, 5, profile_data[2][2][1])
+    worksheet.write(xls_row, 6, profile_data[2][2][2])
+    worksheet.write(xls_row, 7, profile_data[2][3])
 
 workbook.close()
