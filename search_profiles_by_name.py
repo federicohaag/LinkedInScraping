@@ -11,7 +11,7 @@ username, password, browser = load_configurations()
 linkedin_login(browser, username, password)
 
 results = []
-for query in open("profiles_urls.txt", "r"):
+for query in open("profiles_names.txt", "r"):
 
     # Keeps the session active over the time
     if len(results) % 100 == 0:
