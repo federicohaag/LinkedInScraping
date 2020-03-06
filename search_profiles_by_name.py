@@ -1,6 +1,6 @@
 import time
 import xlsxwriter
-from utils import linkedin_login, linkedin_logout, load_configurations, is_polimi
+from utils import linkedin_login, linkedin_logout, load_configurations, did_study_in_polimi
 
 waiting_time_to_load = 5
 
@@ -14,7 +14,7 @@ results = []
 for query in open("profiles_names.txt", "r"):
 
     # Keeps the session active over the time
-    if len(results) % 100 == 0:
+    if len(results) > 100 and len(results) % 100 == 0:
         linkedin_logout(browser)
         linkedin_login(browser, username, password)
 
@@ -37,7 +37,7 @@ for query in open("profiles_names.txt", "r"):
             # ACCEPTANCE CONDITIONS
 
             # Checks if the contact studied in Politecnico di Milano.
-            if not is_polimi(browser):
+            if not did_study_in_polimi(browser):
                 url = 'NO POLIMI'
     except:
         url = 'N/A'
