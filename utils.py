@@ -74,25 +74,3 @@ def parse_date(date_str):
 
 def get_months_between_dates(earlier_date, later_date):
     return (time.mktime(later_date) - time.mktime(earlier_date)) // 2592000
-
-
-def did_study_in_polimi(browser):
-    if len(browser.find_elements_by_class_name('pv-top-card--experience-list-item')) > 1:
-        if 'Politecnico di Milano' in browser.find_elements_by_class_name('pv-top-card--experience-list-item')[1].text:
-            return True
-
-    window_height = browser.execute_script("return window.innerHeight")
-    i = 1
-
-    while i < 6:
-        browser.execute_script(f"window.scrollTo(0, {window_height * i});")
-        time.sleep(5)
-
-        try:
-            if 'Politecnico di Milano' in browser.find_element_by_id('education-section').text:
-                return True
-        except:
-            pass
-
-        i += 1
-    return False

@@ -20,9 +20,9 @@ def get_profile_data(encoded_profile_data, delimiter):
     profile_data_splitted = encoded_profile_data.split(delimiter)
 
     profile_linkedin_url = profile_data_splitted[0]
-    known_graduation_date = None
 
     # Set the known graduation date if the input is url:::graduation_date
+    known_graduation_date = None
     if len(profile_data_splitted) == 2:
         known_graduation_date = time.strptime(profile_data_splitted[1].strip(), '%d/%m/%y')
 
@@ -78,9 +78,12 @@ def get_profile_data(encoded_profile_data, delimiter):
     soup = BeautifulSoup(browser.page_source, 'lxml')
 
     # Scraping the Name (using soup)
-    name_div = soup.find('div', {'class': 'flex-1 mr5'})
-    name_loc = name_div.find_all('ul')
-    profile_name = name_loc[0].find('li').get_text().strip()
+    try:
+        name_div = soup.find('div', {'class': 'flex-1 mr5'})
+        name_loc = name_div.find_all('ul')
+        profile_name = name_loc[0].find('li').get_text().strip()
+    except:
+        return get_profile_result('NO_LINKEDIN_PROFILE')
 
     # Parsing the job positions
     if len(list_of_job_positions) == 0:
@@ -102,15 +105,7 @@ def get_profile_data(encoded_profile_data, delimiter):
                 pass
 
         # Compute the 'job history' of the profile if the graduation date is provided in profiles_data.txt file
-        if not known_graduation_date is None:
-            job_history_summary = compute_job_history_summary(job_positions_data_ranges, known_graduation_date)
-        else:
-            job_history_summary = {
-                'had_job_while_studying': 'N/A',
-                'had_job_after_graduation': 'N/A',
-                'had_job_after_graduation_within_3_months': 'N/A',
-                'had_job_after_graduation_within_5_months': 'N/A'
-            }
+        job_history_summary = compute_job_history_summary(known_graduation_date, job_positions_data_ranges)
 
         # Scraping of the last (hopefully current) Job Position
         exp_section = soup.find('section', {'id': 'experience-section'})
@@ -162,16 +157,12 @@ def get_profile_data(encoded_profile_data, delimiter):
 
 
 # Returns a data structure that is agreed with the excel builder.
-def get_profile_result(profile_name, email, company_name='N/A', job_title='N/A', city='N/A', country='N/A',
+def get_profile_result(profile_name, email='N/A', company_name='N/A', job_title='N/A', city='N/A', country='N/A',
                        location='N/A', industry='N/A', job_history_summary=None):
 
     if job_history_summary is None:
-        job_history_summary = {
-            'had_job_while_studying': 'N/A',
-            'had_job_after_graduation': 'N/A',
-            'had_job_after_graduation_within_3_months': 'N/A',
-            'had_job_after_graduation_within_5_months': 'N/A'
-        }
+        job_history_summary = compute_job_history_summary(None, [])
+
     return [
         profile_name,
         email,
@@ -179,46 +170,67 @@ def get_profile_result(profile_name, email, company_name='N/A', job_title='N/A',
             company_name, job_title, [city, country, location], industry
         ],
         [
-            job_history_summary['had_job_while_studying'],
-            job_history_summary['had_job_after_graduation'],
-            job_history_summary['had_job_after_graduation_within_3_months'],
-            job_history_summary['had_job_after_graduation_within_5_months']
+            boolean_to_string_xls(job_history_summary['had_job_while_studying']),
+            boolean_to_string_xls(job_history_summary['had_job_after_graduation']),
+            boolean_to_string_xls(job_history_summary['had_job_after_graduation_within_3_months']),
+            boolean_to_string_xls(job_history_summary['had_job_after_graduation_within_5_months']),
+            boolean_to_string_xls(job_history_summary['had_job_while_studying_warning_short_duration'])
         ]
     ]
 
 
+def boolean_to_string_xls(boolean_value):
+    if boolean_value is None:
+        return 'N/A'
+
+    return 'X' if boolean_value else ''
+
+
 # Returns a 'summary' of the job history of the person with reference to the known graduation_date
-def compute_job_history_summary(job_positions_data_ranges, graduation_date):
-    had_job_while_studying = False
-    had_job_after_graduation = False
-    had_job_after_graduation_within_3_months = False
-    had_job_after_graduation_within_5_months = False
+def compute_job_history_summary(graduation_date, job_positions_data_ranges):
 
-    for date_range in job_positions_data_ranges:
+    if graduation_date is not None and len(job_positions_data_ranges) > 0:
 
-        # Split the date range into the two initial and ending date
-        initial_date, end_date = split_date_range(date_range)
+        had_job_while_studying = False
+        had_job_after_graduation = False
+        had_job_after_graduation_within_3_months = False
+        had_job_after_graduation_within_5_months = False
+        had_job_while_studying_warning_short_duration = False
 
-        # Checking if was working while studying
-        if initial_date <= graduation_date:
-            if end_date >= graduation_date:
-                had_job_while_studying = True
-            else:
-                if get_months_between_dates(earlier_date=end_date, later_date=graduation_date) <= 20:
+        for date_range in job_positions_data_ranges:
+
+            # Split the date range into the two initial and ending date
+            initial_date, end_date = split_date_range(date_range)
+
+            # Checking if was working while studying
+            if initial_date < graduation_date:
+                if end_date > graduation_date:
                     had_job_while_studying = True
-        else:
-            had_job_after_graduation = True
-            if get_months_between_dates(earlier_date=graduation_date, later_date=initial_date) <= 3:
-                had_job_after_graduation_within_3_months = True
+                    if get_months_between_dates(earlier_date=initial_date, later_date=graduation_date) <= 3:
+                        had_job_while_studying_warning_short_duration = True
+                else:
+                    if get_months_between_dates(earlier_date=end_date, later_date=graduation_date) <= 20:
+                        had_job_while_studying = True
             else:
-                if get_months_between_dates(earlier_date=graduation_date, later_date=initial_date) <= 5:
-                    had_job_after_graduation_within_5_months = True
+                had_job_after_graduation = True
+                if get_months_between_dates(earlier_date=graduation_date, later_date=initial_date) <= 3:
+                    had_job_after_graduation_within_3_months = True
+                else:
+                    if get_months_between_dates(earlier_date=graduation_date, later_date=initial_date) <= 5:
+                        had_job_after_graduation_within_5_months = True
+    else:
+        had_job_while_studying = None
+        had_job_after_graduation = None
+        had_job_after_graduation_within_3_months = None
+        had_job_after_graduation_within_5_months = None
+        had_job_while_studying_warning_short_duration = None
 
     return {
         'had_job_while_studying': had_job_while_studying,
         'had_job_after_graduation': had_job_after_graduation,
         'had_job_after_graduation_within_3_months': had_job_after_graduation_within_3_months,
-        'had_job_after_graduation_within_5_months': had_job_after_graduation_within_5_months
+        'had_job_after_graduation_within_5_months': had_job_after_graduation_within_5_months,
+        'had_job_while_studying_warning_short_duration': had_job_while_studying_warning_short_duration
     }
 
 
@@ -232,15 +244,23 @@ browser = webdriver.Chrome(executable_path=driver_bin)
 linkedin_login(browser, username, password)
 
 # Loading of Profiles data - see: get_profile_data()
-profiles_data = []
+index, number_of_profiles, profiles_data, start_time = -1, 0, [], time.time()
 for profile_data in open("profiles_data.txt", "r"):
+    index += 1
+    if index == 0:
+        number_of_profiles = int(profile_data.strip())
+        continue
+    else:
+        ending_in = time.strftime("%H:%M:%S", time.gmtime(((time.time() - start_time) / index) * (number_of_profiles - index)))
+        print(f"Scraping profile {index} / {number_of_profiles} - {ending_in} left")
 
     profiles_data.append(get_profile_data(profile_data, delimiter=':::'))
 
-    # Keeps the session active: every 100 profiles do logout and then login after 10 seconds
-    if len(profiles_data) % 100 == 0:
+    # Keeps the session active: every 50 profiles logout and then login after 2 minutes (prevents LinkedIn human check)
+    if len(profiles_data) % 50 == 0:
         linkedin_logout(browser)
-        time.sleep(10)
+        browser.get('https://www.google.com/')
+        time.sleep(120)
         linkedin_login(browser, username, password)
 
 # Closing the Chrome instance
@@ -252,7 +272,7 @@ worksheet = workbook.add_worksheet()
 
 headers = ['Name', 'Email', 'Company', 'Job Title', 'City', 'Country', 'Full Location', 'Industry',
            'Working while studying', 'Found job after graduation', 'Found job within 3 months',
-           'Found job within 5 months']
+           'Found job within 5 months', 'Short Job While Studying']
 
 # Set the headers of xls file
 for h in range(len(headers)):
@@ -279,5 +299,9 @@ for i in range(len(profiles_data)):
     worksheet.write(xls_row, 9, profile_data[3][1])
     worksheet.write(xls_row, 10, profile_data[3][2])
     worksheet.write(xls_row, 11, profile_data[3][3])
+    worksheet.write(xls_row, 12, profile_data[3][4])
 
 workbook.close()
+
+print(f"Scraping ended at {time.strftime('%H:%M:%S', time.gmtime(time.time()))}")
+print(f"Parsed {number_of_profiles} profiles in {time.strftime('%H:%M:%S', time.gmtime(time.time()-start_time))}")
