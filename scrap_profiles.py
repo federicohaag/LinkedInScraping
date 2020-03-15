@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 
 from utils import linkedin_login, linkedin_logout, load_configurations, is_url_valid, get_months_between_dates, \
-    split_date_range
+    split_date_range, get_today_date
 
 
 def get_profile_data(encoded_profile_data, delimiter):
@@ -100,7 +100,9 @@ def get_profile_data(encoded_profile_data, delimiter):
             try:
                 date_range_element = job_position.find_element_by_class_name('pv-entity__date-range')
                 date_range_spans = date_range_element.find_elements_by_tag_name('span')
-                job_positions_data_ranges.append(date_range_spans[1].text)
+                date_range = date_range_spans[1].text
+
+                job_positions_data_ranges.append(date_range)
             except:
                 pass
 
@@ -174,7 +176,11 @@ def get_profile_result(profile_name, email='N/A', company_name='N/A', job_title=
             boolean_to_string_xls(job_history_summary['had_job_after_graduation']),
             boolean_to_string_xls(job_history_summary['had_job_after_graduation_within_3_months']),
             boolean_to_string_xls(job_history_summary['had_job_after_graduation_within_5_months']),
-            boolean_to_string_xls(job_history_summary['had_job_while_studying_warning_short_duration'])
+            boolean_to_string_xls(job_history_summary['had_job_while_studying_warning_short_duration']),
+            boolean_to_string_xls(job_history_summary['date_first_job_ever']),
+            boolean_to_string_xls(job_history_summary['date_first_job_after_beginning_university']),
+            boolean_to_string_xls(job_history_summary['date_first_job_after_ending_university']),
+            boolean_to_string_xls(job_history_summary['more_than_a_job_now'])
         ]
     ]
 
@@ -197,10 +203,22 @@ def compute_job_history_summary(graduation_date, job_positions_data_ranges):
         had_job_after_graduation_within_5_months = False
         had_job_while_studying_warning_short_duration = False
 
+        date_first_job_ever = None
+        date_first_job_after_beginning_university = None
+        date_first_job_after_ending_university = None
+
+        jobs_now = 0
+
         for date_range in job_positions_data_ranges:
+
+            if 'present' in date_range.lower():
+                jobs_now += 1
 
             # Split the date range into the two initial and ending date
             initial_date, end_date = split_date_range(date_range)
+
+            if date_first_job_ever is None or initial_date < date_first_job_ever:
+                date_first_job_ever = initial_date
 
             # Checking if was working while studying
             if initial_date < graduation_date:
@@ -211,6 +229,11 @@ def compute_job_history_summary(graduation_date, job_positions_data_ranges):
                 else:
                     if get_months_between_dates(earlier_date=end_date, later_date=graduation_date) <= 20:
                         had_job_while_studying = True
+
+                if get_months_between_dates(earlier_date=initial_date, later_date=graduation_date) > 24:
+                    if date_first_job_after_beginning_university is None or initial_date < date_first_job_after_beginning_university:
+                        date_first_job_after_beginning_university = initial_date
+
             else:
                 had_job_after_graduation = True
                 if get_months_between_dates(earlier_date=graduation_date, later_date=initial_date) <= 3:
@@ -218,6 +241,11 @@ def compute_job_history_summary(graduation_date, job_positions_data_ranges):
                 else:
                     if get_months_between_dates(earlier_date=graduation_date, later_date=initial_date) <= 5:
                         had_job_after_graduation_within_5_months = True
+
+                if date_first_job_after_ending_university is None or initial_date < date_first_job_after_ending_university:
+                    date_first_job_after_ending_university = initial_date
+
+        more_than_a_job_now = jobs_now > 1
     else:
         had_job_while_studying = None
         had_job_after_graduation = None
@@ -225,12 +253,22 @@ def compute_job_history_summary(graduation_date, job_positions_data_ranges):
         had_job_after_graduation_within_5_months = None
         had_job_while_studying_warning_short_duration = None
 
+        date_first_job_ever = None
+        date_first_job_after_beginning_university = None
+        date_first_job_after_ending_university = None
+
+        more_than_a_job_now = None
+
     return {
         'had_job_while_studying': had_job_while_studying,
         'had_job_after_graduation': had_job_after_graduation,
         'had_job_after_graduation_within_3_months': had_job_after_graduation_within_3_months,
         'had_job_after_graduation_within_5_months': had_job_after_graduation_within_5_months,
-        'had_job_while_studying_warning_short_duration': had_job_while_studying_warning_short_duration
+        'had_job_while_studying_warning_short_duration': had_job_while_studying_warning_short_duration,
+        'date_first_job_ever': date_first_job_ever,
+        'date_first_job_after_beginning_university': date_first_job_after_beginning_university,
+        'date_first_job_after_ending_university': date_first_job_after_ending_university,
+        'more_than_a_job_now': more_than_a_job_now
     }
 
 
@@ -272,7 +310,7 @@ worksheet = workbook.add_worksheet()
 
 headers = ['Name', 'Email', 'Company', 'Job Title', 'City', 'Country', 'Full Location', 'Industry',
            'Working while studying', 'Found job after graduation', 'Found job within 3 months',
-           'Found job within 5 months', 'Short Job While Studying']
+           'Found job within 5 months', 'Short Job While Studying', 'DATE FIRST JOB EVER', 'DATE FIRST JOB AFTER BEGINNING POLIMI', 'DATE FIRST JOB AFTER ENDING POLIMI', 'MORE THAN ONE JOB POSITION']
 
 # Set the headers of xls file
 for h in range(len(headers)):
@@ -300,6 +338,10 @@ for i in range(len(profiles_data)):
     worksheet.write(xls_row, 10, profile_data[3][2])
     worksheet.write(xls_row, 11, profile_data[3][3])
     worksheet.write(xls_row, 12, profile_data[3][4])
+    worksheet.write(xls_row, 13, profile_data[3][5])
+    worksheet.write(xls_row, 14, profile_data[3][6])
+    worksheet.write(xls_row, 15, profile_data[3][7])
+    worksheet.write(xls_row, 16, profile_data[3][8])
 
 workbook.close()
 

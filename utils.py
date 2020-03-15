@@ -57,9 +57,13 @@ def split_date_range(date_range):
     return [begin, end]
 
 
+def get_today_date():
+    return time.strptime(time.strftime('%d %m %y'), '%d %m %y')
+
+
 def parse_date(date_str):
     if date_str == 'Present':
-        return time.strptime(time.strftime('%d %m %y'), '%d %m %y')
+        return get_today_date()
 
     try:
         date = time.strptime(date_str, '%b %Y')

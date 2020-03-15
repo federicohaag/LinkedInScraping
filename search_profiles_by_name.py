@@ -15,7 +15,7 @@ browser = webdriver.Chrome(executable_path=driver_bin)
 # Doing login on LinkedIn
 linkedin_login(browser, username, password)
 
-time.sleep(waiting_time_to_load_page)
+time.sleep(120)
 
 results = []
 for query in open("profiles_names.txt", "r"):
@@ -42,7 +42,7 @@ for query in open("profiles_names.txt", "r"):
 
         i = 0
 
-        while i < len(search_results) and best_solution[2] != 'GRAD_CHECKED':
+        while i < len(search_results) and not (best_solution[1] is True and best_solution[2] == 'GRAD_CHECKED'):
 
             if i > 0:
                 # Clears the search box
@@ -87,22 +87,26 @@ for query in open("profiles_names.txt", "r"):
 
                         edu_info = education.find_element_by_class_name('pv-entity__degree-info').text
 
-                        if 'management' in edu_info.lower() or 'gestionale' in edu_info.lower():
+                        if 'management' in edu_info.lower() or 'gestionale' in edu_info.lower() or 'finance' in edu_info.lower() or 'managment' in edu_info.lower():
                             is_management = True
                         else:
                             is_management = False
 
-                        best_solution = [browser.current_url, is_management, 'NO_GRAD_CHECK']
+                        grad_check = 'NO_GRAD_CHECK'
 
-                        graduation_year = '20'+graduation_date.split('/')[-1].strip()
+                        graduation_year = '20' + graduation_date.split('/')[-1].strip()
                         try:
                             education_dates = education.find_element_by_class_name('pv-entity__dates').text.split(' – ')
-                            print(f">{graduation_year},{education_dates[1]}<")
                             if graduation_year == education_dates[1].strip():
-                                best_solution = [browser.current_url, is_management, 'GRAD_CHECKED']
-                                break
+                                grad_check = 'GRAD_CHECKED'
                         except:
                             pass
+
+                        if (best_solution[1] is False and is_management is True) \
+                                or best_solution[1] == '' \
+                                or (best_solution[2] == 'NO_GRAD_CHECK' and grad_check == 'GRAD_CHECKED')\
+                                or best_solution[2] == '':
+                            best_solution = [browser.current_url, is_management, grad_check]
             i += 1
 
     except Exception as e:
