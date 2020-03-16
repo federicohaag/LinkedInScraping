@@ -26,10 +26,10 @@ class JobHistorySummary:
 
         if jobs_now is None:
             self.more_than_a_job_now = None
-            self.has_currently_a_job = None
+            self.is_currently_unemployed = None
         else:
-            self.more_than_a_job_now = jobs_now > 0
-            self.has_currently_a_job = jobs_now > 1
+            self.more_than_a_job_now = jobs_now > 1
+            self.is_currently_unemployed = jobs_now == 0
 
 
 class Location:
@@ -378,7 +378,7 @@ worksheet = workbook.add_worksheet()
 
 headers = ['Name', 'Email', 'Company', 'Job Title', 'City', 'Country', 'Full Location', 'Industry',
            'Working while studying', 'Found job after graduation', 'Found job within 3 months',
-           'Found job within 5 months', 'Short Job While Studying', 'DATE FIRST JOB EVER', 'DATE FIRST JOB AFTER BEGINNING POLIMI', 'DATE FIRST JOB AFTER ENDING POLIMI', 'MORE THAN ONE JOB POSITION', 'HAS JOB NOW']
+           'Found job within 5 months', 'Short Job While Studying', 'DATE FIRST JOB EVER', 'DATE FIRST JOB AFTER BEGINNING POLIMI', 'DATE FIRST JOB AFTER ENDING POLIMI', 'MORE THAN ONE JOB POSITION', 'NO JOB NOW']
 
 # Set the headers of xls file
 for h in range(len(headers)):
@@ -410,7 +410,7 @@ for i in range(len(scraping_results)):
             date_to_string_xls(p.jobs_history.date_first_job_after_beginning_university),
             date_to_string_xls(p.jobs_history.date_first_job_after_ending_university),
             boolean_to_string_xls(p.jobs_history.more_than_a_job_now),
-            boolean_to_string_xls(p.jobs_history.has_currently_a_job)
+            boolean_to_string_xls(p.jobs_history.is_currently_unemployed)
         ]
 
     for j in range(len(data)):
