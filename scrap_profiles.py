@@ -375,7 +375,7 @@ for profile_data in open(config.input_file, "r"):
 browser.quit()
 
 # Generation of XLS file with profiles data
-workbook = xlsxwriter.Workbook(config.output_file)
+workbook = xlsxwriter.Workbook(config.output_file+"_"+str(int(time.time()))+".xlsx")
 worksheet = workbook.add_worksheet()
 
 headers = ['Name', 'Email', 'Company', 'Job Title', 'City', 'Country', 'Full Location', 'Industry',
