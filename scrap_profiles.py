@@ -356,9 +356,11 @@ for profile_data in open(config.input_file, "r"):
     print(f"Scraping profile {count} / {number_of_profiles} - {ending_in} left")
 
     # Scrap profile
-    scraping_result: ScrapingResult = scrap_profile(profile_data, config.profile_data_delimiter)
-
-    scraping_results.append(scraping_result)
+    try:
+        scraping_result: ScrapingResult = scrap_profile(profile_data, config.profile_data_delimiter)
+        scraping_results.append(scraping_result)
+    except:
+        scraping_results.append(ScrapingResult('GenericError'))
 
     # Keeps the session active: every 50 profiles logout and then login after 2 minutes (prevents LinkedIn human check)
     if len(scraping_results) % config.number_of_profile_to_relogin == 0:
@@ -389,7 +391,7 @@ for i in range(len(scraping_results)):
     scraping_result = scraping_results[i]
 
     if scraping_result.is_error():
-        data = ['ERROR'] * len(headers)
+        data = ['Error_'+scraping_result.message] * len(headers)
     else:
         p = scraping_result.profile
         data = [
