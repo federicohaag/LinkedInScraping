@@ -21,17 +21,39 @@ def linkedin_login(browser, username, password):
         pass
 
 
-def load_configurations():
-    configurations = open('configs.txt', 'r')
-    username = configurations.readline()
-    password = configurations.readline()
-    driver = configurations.readline()
-    configurations.close()
+class Configuration:
+    def __init__(self, username, password, driver_bin, number_of_profile_to_relogin, waiting_time_to_relogin, relogin_waiting_url, profile_data_delimiter, input_file, output_file):
+        self.username = username
+        self.password = password
+        self.driver_bin = driver_bin
+        self.number_of_profile_to_relogin = number_of_profile_to_relogin
+        self.waiting_time_to_relogin = waiting_time_to_relogin
+        self.relogin_waiting_url = relogin_waiting_url
+        self.profile_data_delimiter = profile_data_delimiter
+        self.input_file = input_file
+        self.output_file = output_file
+
+
+def load_configurations() -> Configuration:
+
+    with open('configs.txt', 'r') as configs_file:
+        username = configs_file.readline().strip()
+        password = configs_file.readline().strip()
+        driver = configs_file.readline().strip()
+
+        number_of_profile_to_relogin = int(configs_file.readline().strip())
+        waiting_time_to_relogin = int(configs_file.readline().strip())
+        relogin_waiting_url = configs_file.readline().strip()
+        profile_data_delimiter = configs_file.readline().strip()
+        input_file = configs_file.readline().strip()
+        output_file = configs_file.readline().strip()
 
     # Building of the path to Chrome driver executable file
     driver_bin = os.path.join(os.path.abspath(os.path.dirname(__file__)), driver)
 
-    return [username, password, driver_bin]
+    config = Configuration(username, password, driver_bin, number_of_profile_to_relogin, waiting_time_to_relogin, relogin_waiting_url, profile_data_delimiter, input_file, output_file)
+
+    return config
 
 
 def is_url_valid(url):
@@ -78,3 +100,17 @@ def parse_date(date_str):
 
 def get_months_between_dates(earlier_date, later_date):
     return (time.mktime(later_date) - time.mktime(earlier_date)) // 2592000
+
+
+def boolean_to_string_xls(boolean_value):
+    if boolean_value is None:
+        return 'N/A'
+
+    return 'X' if boolean_value else ''
+
+
+def date_to_string_xls(date):
+    if date is None:
+        return 'N/A'
+
+    return time.strftime("%b-%y", date)
