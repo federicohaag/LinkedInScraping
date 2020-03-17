@@ -2,6 +2,7 @@ import time
 import xlsxwriter
 from bs4 import BeautifulSoup
 from selenium import webdriver
+import pyttsx3
 
 from utils import linkedin_login, linkedin_logout, load_configurations, is_url_valid, get_months_between_dates, \
     split_date_range, boolean_to_string_xls, date_to_string_xls, Configuration
@@ -98,6 +99,8 @@ def scrap_profile(profile_to_scrap, delimiter: str) -> ScrapingResult:
             while browser.current_url != 'https://www.linkedin.com/feed/':
                 time.sleep(30)
                 print("Waiting for user to do human check...")
+                engine.say('Per favore esegui controllo umano')
+                engine.runAndWait()
 
     return result
 
@@ -334,6 +337,10 @@ def compute_job_history_summary(graduation_date, job_positions_data_ranges, job_
 
     return summary
 
+# Creating instance for voice feedbacks
+engine = pyttsx3.init()
+engine.say('Avvio lettura profili Linkedin')
+engine.runAndWait()
 
 # Loading of configurations
 config: Configuration = load_configurations()
@@ -424,3 +431,6 @@ workbook.close()
 
 print(f"Scraping ended at {time.strftime('%H:%M:%S', time.gmtime(time.time()))}")
 print(f"Parsed {number_of_profiles} profiles in {time.strftime('%H:%M:%S', time.gmtime(time.time()-start_time))}")
+
+engine.say('La procedura è terminata')
+engine.runAndWait()
