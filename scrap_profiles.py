@@ -233,6 +233,8 @@ def get_profile_data(profile_data_line):
 
             spans = exp_section.find('ul').find('li').find_all('span')
 
+        current_job_company_name = current_job_company_name.replace('Full-time', '').replace('Part-time', '').strip()
+
         # Scraping of last (hopefully current) Job - location
         location = Location()
         next_span_is_location = False
