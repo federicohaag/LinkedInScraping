@@ -96,6 +96,9 @@ def scrap_profile(profile_to_scrap, delimiter: str) -> ScrapingResult:
             result = get_profile_data(profile_to_scrap.split(delimiter))
 
         except HumanCheckException:
+
+            linkedin_login(browser, config.username, config.password)
+
             while browser.current_url != 'https://www.linkedin.com/feed/':
                 time.sleep(30)
                 print("Waiting for user to do human check...")
