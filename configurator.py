@@ -42,7 +42,10 @@ print("Insert the name of the .txt file that contains people profile urls.")
 print("Notice: It doesn't matter if it doesn't exist right now.")
 print("Suggested: profiles_data.txt")
 print("> ", end="")
-config.set('profiles_data', 'input_file_name', input())
+input_file_name = input()
+config.set('profiles_data', 'input_file_name', input_file_name)
+with open(input_file_name, "w"):
+    pass
 
 print("Insert the delimiter used between profile url and graduation date. If no graduation dates are present, "
       "just insert a random string.")
@@ -65,7 +68,10 @@ print("Insert the file name containing people names.")
 print("Notice: It doesn't matter if it doesn't exist right now.")
 print("Suggested: profiles_names.txt")
 print("> ", end="")
-config.set('profiles_data_by_name', 'input_file_name', input())
+input_file_name = input()
+config.set('profiles_data_by_name', 'input_file_name', input_file_name)
+with open(input_file_name, "w"):
+    pass
 
 print("Insert the delimiter used between people first name, last name, graduation date.")
 print("Suggested: :::")
