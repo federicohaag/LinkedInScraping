@@ -1,20 +1,20 @@
 import time
 import xlsxwriter
+from configparser import ConfigParser
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import pyttsx3
 
-from utils import linkedin_login, linkedin_logout, load_configurations, is_url_valid, get_months_between_dates, \
-    split_date_range, boolean_to_string_xls, date_to_string_xls, Configuration
-
-
-class HumanCheckException(Exception):
-    """Human Check from Linkedin"""
-    pass
+from utils import linkedin_login, is_url_valid, get_months_between_dates, \
+    split_date_range, boolean_to_string_xls, date_to_string_xls, HumanCheckException
 
 
 class JobHistorySummary:
-    def __init__(self, had_job_while_studying=None, had_job_after_graduation=None, had_job_after_graduation_within_3_months=None, had_job_after_graduation_within_5_months=None, had_job_while_studying_warning_short_duration=None, date_first_job_ever=None, date_first_job_after_beginning_university=None, date_first_job_after_ending_university=None, jobs_now=None):
+    def __init__(self, had_job_while_studying=None, had_job_after_graduation=None,
+                 had_job_after_graduation_within_3_months=None, had_job_after_graduation_within_5_months=None,
+                 had_job_while_studying_warning_short_duration=None, date_first_job_ever=None,
+                 date_first_job_after_beginning_university=None, date_first_job_after_ending_university=None,
+                 jobs_now=None):
         self.had_job_while_studying = had_job_while_studying
         self.had_job_after_graduation = had_job_after_graduation
         self.had_job_after_graduation_within_3_months = had_job_after_graduation_within_3_months
@@ -42,6 +42,7 @@ class Location:
     def parse_string(self, location):
         self.full_string = location
         if ',' in location:
+            # TODO: Probably useless try - except. To be checked.
             try:
                 self.city = location.split(',')[0]
                 self.country = location.split(',')[-1]
@@ -86,31 +87,9 @@ class ScrapingResult:
         return self.profile is None
 
 
+# TODO: find out what is the type of exception that can be fired to do specific except (and not general ones like now)
 def scrap_profile(profile_to_scrap, delimiter: str) -> ScrapingResult:
-
-    result = None
-
-    while result is None:
-
-        try:
-            result = get_profile_data(profile_to_scrap.split(delimiter))
-
-        except HumanCheckException:
-
-            linkedin_login(browser, config.username, config.password)
-
-            while browser.current_url != 'https://www.linkedin.com/feed/':
-                time.sleep(30)
-                print("Waiting for user to do human check...")
-                engine.say('Per favore esegui controllo umano')
-                engine.runAndWait()
-
-    return result
-
-
-def get_profile_data(profile_data_line):
-    global industries_dict
-    # this function supports data as:
+    # This function supports data as:
     #
     #   https://www.linkedin.com/in/federicohaag ==> parse name, email, last job
     #
@@ -119,19 +98,39 @@ def get_profile_data(profile_data_line):
     #   and how fast she/he got a job after the graduation.
     #   As graduation date is used the one passed as parameter, NOT the date it could be on LinkedIn
 
+    if delimiter in profile_to_scrap:
+        profile_data = profile_to_scrap.split(delimiter)
+        profile_linkedin_url = profile_data[0]
+        profile_known_graduation_date = time.strptime('/'.join(profile_data[1].strip().split("/")[1:]), '%m/%y')
+    else:
+        profile_linkedin_url = profile_to_scrap
+        profile_known_graduation_date = None
+
+    if not is_url_valid(profile_linkedin_url):
+        return ScrapingResult('BadFormattedLink')
+
+    # Scraping of the profile may fail due to human check forced by LinkedIn
+    try:
+        return get_profile_data(profile_linkedin_url, profile_known_graduation_date)
+    except HumanCheckException:
+
+        linkedin_login(browser, config.get('linkedin', 'username'), config.get('linkedin', 'password'))
+
+        while browser.current_url != 'https://www.linkedin.com/feed/':
+            print("Waiting for user to do human check...")
+            engine.say('Please execute manual check')
+            engine.runAndWait()
+            time.sleep(30)
+
+        return scrap_profile(profile_to_scrap, delimiter)
+
+
+def get_profile_data(profile_linkedin_url, known_graduation_date):
+    global industries_dict
+
     # Setting of the delay (seconds) between operations that need to be sure loading of page is ended
     loading_pause_time = 2
     loading_scroll_time = 1
-
-    # Get known graduation date
-    known_graduation_date = None
-    if len(profile_data_line) == 2:
-        known_graduation_date = time.strptime('/'.join(profile_data_line[1].strip().split("/")[1:]), '%m/%y')
-
-    # Get the url of LinkedIn profile
-    profile_linkedin_url = profile_data_line[0]
-    if not is_url_valid(profile_linkedin_url):
-        return ScrapingResult('BadFormattedLink')
 
     # Opening of the profile page
     browser.get(profile_linkedin_url)
@@ -218,14 +217,14 @@ def get_profile_data(profile_data_line):
                 pass
 
         # Compute the 'job history' of the profile if the graduation date is provided in profiles_data.txt file
-        job_history_summary = compute_job_history_summary(known_graduation_date, job_positions_data_ranges, job_experiences)
+        job_history_summary = compute_job_history_summary(known_graduation_date, job_positions_data_ranges,
+                                                          job_experiences)
 
         # Scraping of the last (hopefully current) Job
         exp_section = soup.find('section', {'id': 'experience-section'})
         exp_section = exp_section.find('ul')
         div_tags = exp_section.find('div')
         a_tags = div_tags.find('a')
-
 
         # Scraping of the last (hopefully current) Job - company_name, job_title
         try:
@@ -257,7 +256,8 @@ def get_profile_data(profile_data_line):
             try:
                 browser.get('https://www.linkedin.com' + company_url)
                 industries_dict[company_url] = browser.execute_script("return document.getElementsByClassName("
-                                                  "'org-top-card-summary-info-list__info-item')[0].innerText")
+                                                                      "'org-top-card-summary-info-list__info-item')["
+                                                                      "0].innerText")
             except:
                 industries_dict[company_url] = 'N/A'
 
@@ -282,7 +282,6 @@ def get_profile_data(profile_data_line):
 
 # Returns a 'summary' of the job history of the person with reference to the known graduation_date
 def compute_job_history_summary(graduation_date, job_positions_data_ranges, job_experiences) -> JobHistorySummary:
-
     jobs_now = 0
     for job_experience in job_experiences:
 
@@ -314,14 +313,16 @@ def compute_job_history_summary(graduation_date, job_positions_data_ranges, job_
             # Checking if was working while studying
             if initial_date < graduation_date:
 
-                if end_date >= graduation_date or get_months_between_dates(earlier_date=end_date, later_date=graduation_date) < 24:
+                if end_date >= graduation_date or get_months_between_dates(earlier_date=end_date,
+                                                                           later_date=graduation_date) < 24:
                     summary.had_job_while_studying = True
 
                     if get_months_between_dates(earlier_date=initial_date, later_date=graduation_date) <= 3:
                         summary.had_job_while_studying_warning_short_duration = True
 
                 if get_months_between_dates(earlier_date=initial_date, later_date=graduation_date) < 24:
-                    if summary.date_first_job_after_beginning_university is None or initial_date < summary.date_first_job_after_beginning_university:
+                    if summary.date_first_job_after_beginning_university is None \
+                            or initial_date < summary.date_first_job_after_beginning_university:
                         summary.date_first_job_after_beginning_university = initial_date
 
             else:
@@ -332,7 +333,8 @@ def compute_job_history_summary(graduation_date, job_positions_data_ranges, job_
                     if get_months_between_dates(earlier_date=graduation_date, later_date=initial_date) <= 5:
                         summary.had_job_after_graduation_within_5_months = True
 
-                if summary.date_first_job_after_ending_university is None or initial_date < summary.date_first_job_after_ending_university:
+                if summary.date_first_job_after_ending_university is None or \
+                        initial_date < summary.date_first_job_after_ending_university:
                     summary.date_first_job_after_ending_university = initial_date
 
             if summary.date_first_job_after_beginning_university is None:
@@ -340,46 +342,42 @@ def compute_job_history_summary(graduation_date, job_positions_data_ranges, job_
 
     return summary
 
+
 # Creating instance for voice feedbacks
 engine = pyttsx3.init()
-engine.say('Avvio lettura profili Linkedin')
+engine.say('Starting Linkedin Scraping')
 engine.runAndWait()
 
 # Loading of configurations
-config: Configuration = load_configurations()
+config = ConfigParser()
+config.read('config.ini')
 
 # Creation of a new instance of Chrome
-browser = webdriver.Chrome(executable_path=config.driver_bin)
+browser = webdriver.Chrome(executable_path=config.get('system', 'driver'))
 
 # Doing login on LinkedIn
-linkedin_login(browser, config.username, config.password)
+linkedin_login(browser, config.get('linkedin', 'username'), config.get('linkedin', 'password'))
 
 scraping_results = []
 start_time = time.time()
 industries_dict = {}  # Store all the industries scraped to speed up the scraping process
 
-number_of_profiles = sum(1 for profile_data in open(config.input_file, "r"))
+number_of_profiles = sum(1 for profile_data in open(config.get('profiles_data', 'input_file_name'), "r"))
 
 count = 1
-for profile_data in open(config.input_file, "r"):
+for profile_data in open(config.get('profiles_data', 'input_file_name'), "r"):
 
     # Print statistics about ending time of the script
-    ending_in = time.strftime("%H:%M:%S", time.gmtime(((time.time() - start_time) / count) * (number_of_profiles - count)))
+    ending_in = time.strftime("%H:%M:%S",
+                              time.gmtime(((time.time() - start_time) / count) * (number_of_profiles - count)))
     print(f"Scraping profile {count} / {number_of_profiles} - {ending_in} left")
 
     # Scrap profile
     try:
-        scraping_result: ScrapingResult = scrap_profile(profile_data, config.profile_data_delimiter)
+        scraping_result: ScrapingResult = scrap_profile(profile_data, config.get('profiles_data', 'delimiter'))
         scraping_results.append(scraping_result)
     except:
         scraping_results.append(ScrapingResult('GenericError'))
-
-    # Keeps the session active: every 50 profiles logout and then login after 2 minutes (prevents LinkedIn human check)
-    if len(scraping_results) % config.number_of_profile_to_relogin == 0:
-        linkedin_logout(browser)
-        browser.get(config.relogin_waiting_url)
-        time.sleep(config.waiting_time_to_relogin)
-        linkedin_login(browser, config.username, config.password)
 
     count += 1
 
@@ -387,12 +385,20 @@ for profile_data in open(config.input_file, "r"):
 browser.quit()
 
 # Generation of XLS file with profiles data
-workbook = xlsxwriter.Workbook(config.output_file+"_"+str(int(time.time()))+".xlsx")
+
+output_file_name = config.get('profiles_data', 'output_file_name')
+if config.get('profiles_data', 'append_timestamp') == 'Y':
+    output_file_name_splitted = output_file_name.split('.')
+    output_file_name = "".join(output_file_name_splitted[0:-1]) + "_" + str(int(time.time())) + "." + output_file_name_splitted[-1]
+
+workbook = xlsxwriter.Workbook(output_file_name)
 worksheet = workbook.add_worksheet()
 
 headers = ['Name', 'Email', 'Company', 'Job Title', 'City', 'Country', 'Full Location', 'Industry',
            'Working while studying', 'Found job after graduation', 'Found job within 3 months',
-           'Found job within 5 months', 'Short Job While Studying', 'DATE FIRST JOB EVER', 'DATE FIRST JOB AFTER BEGINNING POLIMI', 'DATE FIRST JOB AFTER ENDING POLIMI', 'MORE THAN ONE JOB POSITION', 'NO JOB NOW']
+           'Found job within 5 months', 'Short Job While Studying', 'DATE FIRST JOB EVER',
+           'DATE FIRST JOB AFTER BEGINNING POLIMI', 'DATE FIRST JOB AFTER ENDING POLIMI', 'MORE THAN ONE JOB POSITION',
+           'NO JOB NOW']
 
 # Set the headers of xls file
 for h in range(len(headers)):
@@ -403,7 +409,7 @@ for i in range(len(scraping_results)):
     scraping_result = scraping_results[i]
 
     if scraping_result.is_error():
-        data = ['Error_'+scraping_result.message] * len(headers)
+        data = ['Error_' + scraping_result.message] * len(headers)
     else:
         p = scraping_result.profile
         data = [
@@ -433,7 +439,7 @@ for i in range(len(scraping_results)):
 workbook.close()
 
 print(f"Scraping ended at {time.strftime('%H:%M:%S', time.gmtime(time.time()))}")
-print(f"Parsed {number_of_profiles} profiles in {time.strftime('%H:%M:%S', time.gmtime(time.time()-start_time))}")
+print(f"Parsed {number_of_profiles} profiles in {time.strftime('%H:%M:%S', time.gmtime(time.time() - start_time))}")
 
-engine.say('La procedura è terminata')
+engine.say('Scraping ended')
 engine.runAndWait()
