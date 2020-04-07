@@ -92,7 +92,7 @@ Run `scrap_profiles_by_name.py`.
 You can find inside the `LinkedInScraping` folder the extracted data in the results file `results_profiles_by_name.xlsx`.
 The file name will contain concatenated the current timestamp if the configuration was set as suggested.
 
-###Input structure:
+### Input structure:
 * `FirstName` and `LastName` are required. If not provided the code will break.
 * `KnownUniversity` [optional] can be a single name or a sequence of names using `,` as delimiter.
 * `KnownCourse` [optional] can be a single name or a sequence of names using `,` as delimiter.
@@ -102,13 +102,14 @@ The script will do its best to find a LinkedIn Profile that is consistent with t
 
 *Notice:* The optional parameters has to be inserted in order. This means that you can insert in a row just `FirstName:::LastName`, you can insert just `FirstName:::LastName:::KnownUniversity`, but you can not insert something like `FirstName:::LastName:::KnownCourse`.
 
-###Example: you want to look for Federico Haag profile, you know he is a student of Politecnico di Milano but you don't know if he studies computer science or management engineering. You also know he graduated around the 01/10/2018 (only the year is relevant).
+### Example:
+Let's say you want to look for Federico Haag profile, you know he is a student of Politecnico di Milano but you don't know if he studies computer science or management engineering. You also know he graduated around the 01/10/2018 (only the year is relevant).
 Here is what guarantee you the best match.
 ```
 Federico:::Haag:::Politecnico di Milano:::Computer Science,Management:::01/10/2018
 ```
 
-###Results schema:
+### Results schema:
 * **Education Checked** is `TRUE` if the university & course information of the found LinkedIn Profile are consistent with the provided ones.
 * **Checked Status** can be `GRAD_CHECKED` if the graduation year of the found LinkedIn Profile is consistent with the provided one, `NO_GRAD_CHECK` otherwise.
 
