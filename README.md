@@ -90,10 +90,10 @@ Open the input file `profiles_names.txt` and insert data as follows:
 `FirstName:::LastName:::KnownUniversity:::KnownCourse:::KnownGraduationDate`
 
 Input structure:
-*`FirstName` and `LastName` are required. If not provided the code will break.
-*`KnownUniversity` [optional] can be a single name or a sequence of names using `,` as delimiter.
-*`KnownCourse` [optional] can be a single name or a sequence of names using `,` as delimiter.
-*`KnownGraduationDate` [optional] has to be formatted as DD/MM/YY.
+* `FirstName` and `LastName` are required. If not provided the code will break.
+* `KnownUniversity` [optional] can be a single name or a sequence of names using `,` as delimiter.
+* `KnownCourse` [optional] can be a single name or a sequence of names using `,` as delimiter.
+* `KnownGraduationDate` [optional] has to be formatted as DD/MM/YY.
 
 The script will do its best to find a LinkedIn Profile that is consistent with the specified information.
 
