@@ -67,9 +67,10 @@ class Job:
 
 
 class Profile:
-    def __init__(self, profile_name, email, current_job=Job(), job_history_summary=JobHistorySummary()):
+    def __init__(self, profile_name, email, skills, current_job=Job(), job_history_summary=JobHistorySummary()):
         self.profile_name = profile_name
         self.email = email
+        self.skills = skills
         self.current_job = current_job
         self.jobs_history = job_history_summary
 
@@ -199,6 +200,20 @@ def get_profile_data(profile_linkedin_url, known_graduation_date):
     except:
         return ScrapingResult('ERROR IN SCRAPING NAME')
 
+    #Parsing skills
+    try:
+        browser.execute_script("document.getElementsByClassName('pv-skills-section__additional-skills')[0].click()")
+        time.sleep(loading_pause_time)
+    except:
+        pass
+
+    try:
+        skills = browser.execute_script("return (function(){els = document.getElementsByClassName('pv-skill-category-entity');results = [];for (var i=0; i < els.length; i++){results.push(els[i].getElementsByClassName('pv-skill-category-entity__name-text')[0].innerText);}return results;})()")
+    except:
+        skills = []
+
+    print(skills)
+
     # Parsing the job positions
     if len(list_of_job_positions) > 0:
 
@@ -272,10 +287,10 @@ def get_profile_data(profile_linkedin_url, known_graduation_date):
             company=company,
             location=location
         )
-        profile = Profile(profile_name, email, current_job, job_history_summary)
+        profile = Profile(profile_name, email, skills, current_job, job_history_summary)
 
     else:
-        profile = Profile(profile_name, email)
+        profile = Profile(profile_name, email, skills)
 
     return ScrapingResult(profile)
 
@@ -394,7 +409,7 @@ if config.get('profiles_data', 'append_timestamp') == 'Y':
 workbook = xlsxwriter.Workbook(output_file_name)
 worksheet = workbook.add_worksheet()
 
-headers = ['Name', 'Email', 'Company', 'Job Title', 'City', 'Country', 'Full Location', 'Industry',
+headers = ['Name', 'Email', 'Skills', 'Company', 'Job Title', 'City', 'Country', 'Full Location', 'Industry',
            'Working while studying', 'Found job after graduation', 'Found job within 3 months',
            'Found job within 5 months', 'Short Job While Studying', 'DATE FIRST JOB EVER',
            'DATE FIRST JOB AFTER BEGINNING POLIMI', 'DATE FIRST JOB AFTER ENDING POLIMI', 'MORE THAN ONE JOB POSITION',
@@ -415,6 +430,7 @@ for i in range(len(scraping_results)):
         data = [
             p.profile_name,
             p.email,
+            ",".join(p.skills),
             p.current_job.company.name,
             p.current_job.position,
             p.current_job.location.city,
