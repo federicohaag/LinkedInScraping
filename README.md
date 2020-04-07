@@ -69,9 +69,11 @@ After you complete the check, check that you are viewing the page at `https://ww
 ## Common problems in Running
 
 Especially if based on Windows, you may get this error message:
-```selenium.common.exceptions.WebDriverException: Message: unknown error: cannot find Chrome binary```
+```selenium.common.exceptions.WebDriverException: Message: unknown error: cannot find Chrome binary```.
 If this happens, please replace code at line 371 of scrap_profiles.py from the current content:
-```browser = webdriver.Chrome(executable_path=config.get('system', 'driver'))```
+```
+browser = webdriver.Chrome(executable_path=config.get('system', 'driver'))
+```
 to the following:
 ```
 options = webdriver.ChromeOptions()
@@ -85,14 +87,32 @@ Please consider that `<YOUR_CHROME_PATH>` has to be replaced with the actual pat
 **This script is still not well documented and customizable**
 
 Open the input file `profiles_names.txt` and insert data as follows:
-`FirstName:::LastName:::KnownGraduationDate`
-You can customize the delimiter.
-At the moment is not possible to perform a research without specifying the `KnownGraduationDate`. I understand this could be a limit. As soon as possible I will make it optional.
+`FirstName:::LastName:::KnownUniversity:::KnownCourse:::KnownGraduationDate`
+
+Input structure:
+*`FirstName` and `LastName` are required. If not provided the code will break.
+*`KnownUniversity` [optional] can be a single name or a sequence of names using `,` as delimiter.
+*`KnownCourse` [optional] can be a single name or a sequence of names using `,` as delimiter.
+*`KnownGraduationDate` [optional] has to be formatted as DD/MM/YY.
+
+The script will do its best to find a LinkedIn Profile that is consistent with the specified information.
+
+*Notice:* The optional parameters has to be inserted in order. This means that you can insert in a row just `FirstName:::LastName`, you can insert just `FirstName:::LastName:::KnownUniversity`, but you can not insert something like `FirstName:::LastName:::KnownCourse`.
+
+Example: you want to look for Federico Haag profile, you know he is a student of Politecnico di Milano but you don't know if he studies computer science or management engineering. You also know he graduated around the 01/10/2018 (only the year is relevant).
+Here is what guarantee you the best match.
+```
+Federico:::Haag:::Politecnico di Milano:::Computer Science,Management:::01/10/2018
+```
 
 Run `scrap_profiles_by_name.py`.
 
 You can find inside the `LinkedInScraping` folder the extracted data in the results file `results_profiles_by_name.xlsx`.
 The file name will contain concatenated the current timestamp if the configuration was set as suggested.
+
+Results schema:
+* **Education Checked** is `TRUE` if the university & course information of the found LinkedIn Profile are consistent with the provided ones.
+* **Checked Status** can be `GRAD_CHECKED` if the graduation year of the found LinkedIn Profile is consistent with the provided one, `NO_GRAD_CHECK` otherwise.
 
 ## Customizing
 
