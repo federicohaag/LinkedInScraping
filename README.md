@@ -34,6 +34,14 @@ In any time in the future you can easily re-run the configuration to change for 
 
 I understand the request for LinkedIn username and password could be scary, unfortunately it is necessary. I can guarantee you such information is stored only locally: no personal data is sent to me or anywhere else, except obviously to the Linkedin page to perform the login. You are free to check the code to be sure of this.
 
+### Executing
+
+Every time you execute a scraping, a new Google Chrome window will be opened. **Please don't lose the focus on it.**
+
+You can leave alone the computer but be sure it won't go to sleep mode (for MacOS: [Amphetamine](https://apps.apple.com/it/app/amphetamine/id937984704?mt=12)).
+
+If for any reason the computer go into sleep mode, or you loose the focus on the window, the script will keep on but won't scrap any data. Hence, be really carefull if at the end of the scraping process you end up with profiles that seem to have no data: it may have been this case.
+
 ## Scraping by Profile URL
 
 Open the file `profiles_data.txt`, insert the URLs of the LinkedIn profiles you want to do the scraping.
@@ -44,19 +52,15 @@ If you want also the graduation statistics, append to the url the graduation dat
 
 Run `scrap_profiles.py`.
 
-**Important:** A new Google Chrome window will be opened. **Please don't lose the focus on it.** You can leave the computer but be sure it won't go to sleep mode (for MacOS: [Amphetamine](https://apps.apple.com/it/app/amphetamine/id937984704?mt=12)).
-
 ### Examples ###
 
-For example:
+Only LinkedIn URL:
 ```
 https://www.linkedin.com/in/federicohaag/
 https://www.linkedin.com/in/someoneelse/
 ```
-**Notice:** Each line must contain **only one** URL
 
-If you want also the graduation statistics, append to the url the graduation date with format DD/MM/YY, using the `:::` delimiter.
-For example:
+LinkedIn URL and KnownGraduationDate:
 ```
 https://www.linkedin.com/in/federicohaag/:::01/10/2018
 https://www.linkedin.com/in/someoneelse/:::01/10/2018
