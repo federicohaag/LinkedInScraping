@@ -85,7 +85,9 @@ Please consider that `<YOUR_CHROME_PATH>` has to be replaced with the actual pat
 ## Search for profile url by name
 
 Open the input file `profiles_names.txt` and insert data as follows:
-`FirstName:::LastName:::KnownUniversity:::KnownCourse:::KnownGraduationDate`
+```
+FirstName:::LastName:::KnownUniversity:::KnownCourse:::KnownGraduationDate
+```
 
 Run `scrap_profiles_by_name.py`.
 
