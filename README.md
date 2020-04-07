@@ -34,10 +34,20 @@ In any time in the future you can easily re-run the configuration to change for 
 
 I understand the request for LinkedIn username and password could be scary, unfortunately it is necessary. I can guarantee you such information is stored only locally: no personal data is sent to me or anywhere else, except obviously to the Linkedin page to perform the login. You are free to check the code to be sure of this.
 
-## Running
+## Scraping by Profile URL
 
-Open the file `profiles_data.txt`.
-Insert the URLs of the LinkedIn profiles you want to do the scraping.
+Open the file `profiles_data.txt`, insert the URLs of the LinkedIn profiles you want to do the scraping.
+
+**Notice:** Each line must contain **only one** URL
+
+If you want also the graduation statistics, append to the url the graduation date with format DD/MM/YY, using the `:::` delimiter.
+
+Run `scrap_profiles.py`.
+
+**Important:** A new Google Chrome window will be opened. **Please don't lose the focus on it.** You can leave the computer but be sure it won't go to sleep mode (for MacOS: [Amphetamine](https://apps.apple.com/it/app/amphetamine/id937984704?mt=12)).
+
+### Examples ###
+
 For example:
 ```
 https://www.linkedin.com/in/federicohaag/
@@ -52,35 +62,15 @@ https://www.linkedin.com/in/federicohaag/:::01/10/2018
 https://www.linkedin.com/in/someoneelse/:::01/10/2018
 ```
 
-Run `scrap_profiles.py`.
-
-**Important:** A new Google Chrome window will be opened. **Please don't lose the focus on it.** You can leave the computer but be sure it won't go to sleep mode (for MacOS: [Amphetamine](https://apps.apple.com/it/app/amphetamine/id937984704?mt=12)).
-
 When the Chrome page closes, it means the program ended.
 You can find inside the `LinkedInScraping` folder the extracted data in the results file `results_profiles.xlsx`.
 The file name will contain concatenated the current timestamp if the configuration was set as suggested.
 
-**Human Check by LinkedIn**
+### Human Check by LinkedIn ###
 
 If you scrape consequentially a lot of profiles (hundreds) and especially during not common hours time, LinkedIn may prompt you a Captcha to check you are not a bot. No panic! The script will detect it (please wait for it) and will ask you loud (**check your speakers are on**) to perform the check.
 
 After you complete the check, check that you are viewing the page at `https://www.linkedin.com/feed/`. If not, please immediatly navigate there. The script will detect it and will restart. No data should be loss.
-
-## Common problems in Running
-
-Especially if based on Windows, you may get this error message:
-```selenium.common.exceptions.WebDriverException: Message: unknown error: cannot find Chrome binary```.
-If this happens, please replace code at line 371 of scrap_profiles.py from the current content:
-```
-browser = webdriver.Chrome(executable_path=config.get('system', 'driver'))
-```
-to the following:
-```
-options = webdriver.ChromeOptions()
-options.binary_location = r"<YOUR_CHROME_PATH>\chrome.exe" 
-browser = webdriver.Chrome(executable_path=config.get('system', 'driver'), chrome_options=options)
-```
-Please consider that `<YOUR_CHROME_PATH>` has to be replaced with the actual path to your chrome.exe executable.
 
 ## Search for profile url by name
 
@@ -90,6 +80,8 @@ FirstName:::LastName:::KnownUniversity:::KnownCourse:::KnownGraduationDate
 ```
 
 Run `scrap_profiles_by_name.py`.
+
+**Important:** A new Google Chrome window will be opened. **Please don't lose the focus on it.** You can leave the computer but be sure it won't go to sleep mode (for MacOS: [Amphetamine](https://apps.apple.com/it/app/amphetamine/id937984704?mt=12)).
 
 You can find inside the `LinkedInScraping` folder the extracted data in the results file `results_profiles_by_name.xlsx`.
 The file name will contain concatenated the current timestamp if the configuration was set as suggested.
@@ -102,7 +94,7 @@ The file name will contain concatenated the current timestamp if the configurati
 
 The script will do its best to find a LinkedIn Profile that is consistent with the specified information.
 
-*Notice:* The optional parameters has to be inserted in order. This means that you can insert in a row just `FirstName:::LastName`, you can insert just `FirstName:::LastName:::KnownUniversity`, but you can not insert something like `FirstName:::LastName:::KnownCourse`.
+**Notice:** The optional parameters has to be inserted in order. This means that you can insert in a row just `FirstName:::LastName`, you can insert just `FirstName:::LastName:::KnownUniversity`, but you can not insert something like `FirstName:::LastName:::KnownCourse`.
 
 ### Example:
 Let's say you want to look for Federico Haag profile, you know he is a student of Politecnico di Milano but you don't know if he studies computer science or management engineering. You also know he graduated around the 01/10/2018 (only the year is relevant).
@@ -114,6 +106,29 @@ Federico:::Haag:::Politecnico di Milano:::Computer Science,Management:::01/10/20
 ### Results schema:
 * **Education Checked** is `TRUE` if the university & course information of the found LinkedIn Profile are consistent with the provided ones.
 * **Checked Status** can be `GRAD_CHECKED` if the graduation year of the found LinkedIn Profile is consistent with the provided one, `NO_GRAD_CHECK` otherwise.
+
+### Human Check by LinkedIn ###
+
+If you scrape consequentially a lot of profiles (hundreds) and especially during not common hours time, LinkedIn may prompt you a Captcha to check you are not a bot. No panic! The script will detect it (please wait for it) and will ask you loud (**check your speakers are on**) to perform the check.
+
+After you complete the check, check that you are viewing the page at `https://www.linkedin.com/feed/`. If not, please immediatly navigate there. The script will detect it and will restart. No data should be loss.
+
+
+## Common problems in Running
+
+Especially if based on Windows, you may get this error message:
+```selenium.common.exceptions.WebDriverException: Message: unknown error: cannot find Chrome binary```.
+If this happens, please replace the code lines containing:
+```
+browser = webdriver.Chrome(executable_path=config.get('system', 'driver'))
+```
+with the following:
+```
+options = webdriver.ChromeOptions()
+options.binary_location = r"<YOUR_CHROME_PATH>\chrome.exe" 
+browser = webdriver.Chrome(executable_path=config.get('system', 'driver'), chrome_options=options)
+```
+Please consider that `<YOUR_CHROME_PATH>` has to be replaced with the actual path to your chrome.exe executable.
 
 ## Customizing
 
