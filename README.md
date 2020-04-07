@@ -3,10 +3,10 @@
 Creates an Excel file containing: personal data and last job position.
 
 If you know the graduation date of the person, you can also specify it in the input file to obtain statistics about how fast he/she got a job after graduation.
-Scraping can be done only providing LinkedIn profile url of the target person.
-If the LinkedIn profile url is unknown to you, you can make it to be searched automatically (see below).
 
-Doubts? Reach me out on Linkedin. Find contact info at the end of the README.
+Scraping can be currently done only providing the LinkedIn profile url of the target person. If you dont have yet the LinkedIn profile url, you can make it to be searched automatically (see below).
+
+Doubts? Reach me out on [LinkedIn](https://www.linkedin.com/in/federicohaag/).
 
 ## Getting Started
 
@@ -14,7 +14,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-You must have installed in your machine:
+You must have installed in your machine (higher versions are fine):
 * Google Chrome v.80
 * Python 3.8
 
@@ -30,9 +30,9 @@ pip install -r requirements.txt
  
 When the installation ends, open the directory `LinkedinScraping` and run the `configurator.py` following the instructions.
 If it's the first time, set the configuration as suggested by the messages that will be printed by the configurator.
-In any time in the future you can easily re-run the configuration to change name of files or delimiters.
+In any time in the future you can easily re-run the configuration to change for example name of input / output files or delimiters.
 
-I understand the request for LinkedIn username and password could be scary, unfortunately it is necessary. However such information are stored only locally. No personal data is sent to me or anywhere else, except to the Linkedin page to perform the login. Obviously you are free to check the code to be sure of this.
+I understand the request for LinkedIn username and password could be scary, unfortunately it is necessary. I can guarantee you such information is stored only locally: no personal data is sent to me or anywhere else, except obviously to the Linkedin page to perform the login. You are free to check the code to be sure of this.
 
 ## Running
 
@@ -54,11 +54,16 @@ https://www.linkedin.com/in/someoneelse/:::01/10/2018
 
 Run `scrap_profiles.py`.
 
-**Important:** A new Google Chrome window will be opened. Please don't lose the focus on it. You can leave the computer but be sure it won't go to sleep mode (for MacOS: [Amphetamine](https://apps.apple.com/it/app/amphetamine/id937984704?mt=12)).
+**Important:** A new Google Chrome window will be opened. **Please don't lose the focus on it.** You can leave the computer but be sure it won't go to sleep mode (for MacOS: [Amphetamine](https://apps.apple.com/it/app/amphetamine/id937984704?mt=12)).
 
 When the Chrome page closes, it means the program ended.
 You can find inside the `LinkedInScraping` folder the extracted data in the results file `results_profiles.xlsx`.
 The file name will contain concatenated the current timestamp if the configuration was set as suggested.
+
+**Human Check by LinkedIn**
+If you scrape consequentially a lot of profiles (> 100) and especially during not common hours time, LinkedIn may prompt you a Captcha to check you are not a bot. No panic! The script will detect it (please wait for it) and will ask you loud (**check your speakers are on**) to perform the check.
+
+After you complete the check, check that you are viewing the page at https://www.linkedin.com/feed/. If not, please immediatly navigate there. The script will detect it and will restart. No data should be loss.
 
 ## Search for profile url by name
 
