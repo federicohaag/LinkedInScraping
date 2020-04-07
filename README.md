@@ -1,6 +1,7 @@
 # LinkedIn Scraping with Python
 
 Creates an Excel file containing: personal data and last job position.
+
 If you know the graduation date of the person, you can also specify it in the input file to obtain statistics about how fast he/she got a job after graduation.
 Scraping can be done only providing LinkedIn profile url of the target person.
 If the LinkedIn profile url is unknown to you, you can make it to be searched automatically (see below).
