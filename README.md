@@ -66,6 +66,20 @@ If you scrape consequentially a lot of profiles (hundreds) and especially during
 
 After you complete the check, check that you are viewing the page at `https://www.linkedin.com/feed/`. If not, please immediatly navigate there. The script will detect it and will restart. No data should be loss.
 
+## Common problems in Running
+
+Especially if based on Windows, you may get this error message:
+```selenium.common.exceptions.WebDriverException: Message: unknown error: cannot find Chrome binary```
+If this happens, please replace code at line 371 of scrap_profiles.py from the current content:
+```browser = webdriver.Chrome(executable_path=config.get('system', 'driver'))```
+to the following:
+```
+options = webdriver.ChromeOptions()
+options.binary_location = r"<YOUR_CHROME_PATH>\chrome.exe" 
+browser = webdriver.Chrome(executable_path=config.get('system', 'driver'), chrome_options=options)
+```
+Please consider that `<YOUR_CHROME_PATH>` has to be replaced with the actual path to your chrome.exe executable.
+
 ## Search for profile url by name
 
 **This script is still not well documented and customizable**
