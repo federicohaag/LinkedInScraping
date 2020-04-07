@@ -47,7 +47,7 @@ If you scrape consequentially a lot of profiles (hundreds) and especially during
 After you complete the check, check that you are viewing the page at `https://www.linkedin.com/feed/`. If not, please immediatly navigate there. The script will detect it and will restart. No data should be loss.
 
 
-# Scraping by Profile URL
+## Running Scraping by Profile URL
 
 Open the file `profiles_data.txt` and insert the URLs of the LinkedIn profiles you want to do the scraping.
 
@@ -57,7 +57,7 @@ If you want also the graduation statistics, append to the url the graduation dat
 
 Run `scrap_profiles.py`.
 
-## Examples
+### Examples
 
 Only LinkedIn URL:
 ```
@@ -75,7 +75,7 @@ When the Chrome page closes, it means the program ended.
 You can find inside the `LinkedInScraping` folder the extracted data in the results file `results_profiles.xlsx`.
 The file name will contain concatenated the current timestamp if the configuration was set as suggested.
 
-# Search for profile url by name
+## Running Search for profile url by name
 
 Open the input file `profiles_names.txt` and insert data as follows:
 ```
@@ -84,7 +84,7 @@ FirstName:::LastName:::KnownUniversity:::KnownCourse:::KnownGraduationDate
 
 Run `scrap_profiles_by_name.py`.
 
-## Input structure:
+### Input structure:
 * `FirstName` and `LastName` are required. If not provided the code will break.
 * `KnownUniversity` [optional] can be a single name or a sequence of names using `,` as delimiter.
 * `KnownCourse` [optional] can be a single name or a sequence of names using `,` as delimiter.
@@ -94,18 +94,18 @@ The script will do its best to find a LinkedIn Profile that is consistent with t
 
 **Notice:** The optional parameters has to be inserted in order. This means that you can insert in a row just `FirstName:::LastName`, you can insert just `FirstName:::LastName:::KnownUniversity`, but you can not insert something like `FirstName:::LastName:::KnownCourse`.
 
-## Example:
+### Example:
 Let's say you want to look for Federico Haag profile, you know he is a student of Politecnico di Milano but you don't know if he studies computer science or management engineering. You also know he graduated around the 01/10/2018 (only the year is relevant).
 Here is what guarantee you the best match.
 ```
 Federico:::Haag:::Politecnico di Milano:::Computer Science,Management:::01/10/2018
 ```
 
-## Results schema:
+### Results schema:
 * **Education Checked** is `TRUE` if the university & course information of the found LinkedIn Profile are consistent with the provided ones.
 * **Checked Status** can be `GRAD_CHECKED` if the graduation year of the found LinkedIn Profile is consistent with the provided one, `NO_GRAD_CHECK` otherwise.
 
-# Common problems in Running
+## Common problems in Running
 
 Especially if based on Windows, you may get this error message:
 ```selenium.common.exceptions.WebDriverException: Message: unknown error: cannot find Chrome binary```.
@@ -121,7 +121,7 @@ browser = webdriver.Chrome(executable_path=config.get('system', 'driver'), chrom
 ```
 Please consider that `<YOUR_CHROME_PATH>` has to be replaced with the actual path to your chrome.exe executable.
 
-# Customizing
+## Customizing
 
 You can customize the configurations easily re-running `configurator.py`.
 
@@ -129,14 +129,14 @@ You can also customize the code in many ways:
 *The easy one is changing the order how the data is inserted in the excel file, or renaming the excel file headers.
 *The harder one is to do scraping of additional data: have a look at the Acknowledgments down here or feel free to reach me out to propose new code.
 
-# Authors
+## Authors
 
 * **Federico Haag** - [LinkedIn](https://www.linkedin.com/in/federicohaag/) - [Medium](https://medium.com/@federicohaag)
 
-# Acknowledgments
+## Acknowledgments
 
 * Inspired by: [Repository Link](https://github.com/laxmimerit/LinkedIn-Profile-Scrapper-in-Python)
 
-# Disclaimer
+## Disclaimer
 
 The repository is intended to be used as a reference to learn more on Python and to perform scraping for personal usage. Every country has different and special regulations on usage of personal information, so I strongly recommend you to check your national legislation before using / sharing / selling / elaborating the scraped information. I decline any responsibility on the usage of scraped information. Cloning this repository and executing the included scripts you declare and confirm the responsibility of the scraped data usage is totally up on you.
