@@ -38,9 +38,9 @@ I understand the request for LinkedIn username and password could be scary, unfo
 
 Every time you execute a scraping, a new Google Chrome window will be opened. **Please don't lose the focus on it.**
 
-You can leave alone the computer but be sure it won't go to sleep mode (for MacOS: [Amphetamine](https://apps.apple.com/it/app/amphetamine/id937984704?mt=12)).
+You can leave alone the computer but be sure it won't enter sleep mode (for MacOS: [Amphetamine](https://apps.apple.com/it/app/amphetamine/id937984704?mt=12)).
 
-If for any reason the computer go into sleep mode, or you loose the focus on the window, the script will keep on but won't scrap any data. Hence, be really carefull if at the end of the scraping process you end up with profiles that seem to have no data: it may have been this case.
+If for any reason the computer enter sleep mode, or you loose the focus on the window, the script will keep on but won't scrap any data. Hence, be really carefull if at the end of the scraping process you end up with profiles that seem to have no data: it may have been this case.
 
 ## Scraping by Profile URL
 
