@@ -8,6 +8,10 @@ Scraping can be currently done only providing the LinkedIn profile url of the ta
 
 Doubts? Reach me out on [LinkedIn](https://www.linkedin.com/in/federicohaag/).
 
+## Disclaimer
+
+The repository is intended to be used as a reference to learn more on Python and to perform scraping for personal usage. Every country has different and special regulations on usage of personal information, so I strongly recommend you to inform about your national legislation before using / sharing / selling / elaborating the scraped information.
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
@@ -61,11 +65,14 @@ You can find inside the `LinkedInScraping` folder the extracted data in the resu
 The file name will contain concatenated the current timestamp if the configuration was set as suggested.
 
 **Human Check by LinkedIn**
-If you scrape consequentially a lot of profiles (> 100) and especially during not common hours time, LinkedIn may prompt you a Captcha to check you are not a bot. No panic! The script will detect it (please wait for it) and will ask you loud (**check your speakers are on**) to perform the check.
 
-After you complete the check, check that you are viewing the page at https://www.linkedin.com/feed/. If not, please immediatly navigate there. The script will detect it and will restart. No data should be loss.
+If you scrape consequentially a lot of profiles (hundreds) and especially during not common hours time, LinkedIn may prompt you a Captcha to check you are not a bot. No panic! The script will detect it (please wait for it) and will ask you loud (**check your speakers are on**) to perform the check.
+
+After you complete the check, check that you are viewing the page at `https://www.linkedin.com/feed/`. If not, please immediatly navigate there. The script will detect it and will restart. No data should be loss.
 
 ## Search for profile url by name
+
+**This script is still not well documented and customizable**
 
 Open the input file `profiles_names.txt` and insert data as follows:
 `FirstName:::LastName:::KnownGraduationDate`
@@ -81,11 +88,9 @@ The file name will contain concatenated the current timestamp if the configurati
 
 You can customize the configurations easily re-running `configurator.py`.
 
-You can also customize the code in many ways.
-
-The easy one is changing the order how the data is inserted in the excel file, or renaming the excel file headers.
-
-The harder one is to do scraping of additional data: have a look at the Acknowledgments down here or feel free to reach me out to propose new code.
+You can also customize the code in many ways:
+*The easy one is changing the order how the data is inserted in the excel file, or renaming the excel file headers.
+*The harder one is to do scraping of additional data: have a look at the Acknowledgments down here or feel free to reach me out to propose new code.
 
 ## Authors
 
