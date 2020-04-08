@@ -25,8 +25,9 @@ These instructions will get you a copy of the project up and running on your loc
 ```
 pip install -r requirements.txt
 ```
+ 4. Run `LinkedinScraping\configurator.py` following the prompted instructions.
  
-When the installation ends, open the directory `LinkedinScraping` and run the `configurator.py` following the instructions.
+
 If it's the first time, set the configuration as suggested by the messages that will be printed by the configurator.
 In any time in the future you can easily re-run the configuration to change for example name of input / output files or delimiters.
 
