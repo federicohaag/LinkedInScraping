@@ -8,6 +8,8 @@ Scraping can be currently done only providing the LinkedIn profile url of the ta
 
 Doubts? Reach me out on [LinkedIn](https://www.linkedin.com/in/federicohaag/).
 
+If this code solves you a real problem, I would be grateful if you would consider a donation to enable me in keep on developing such codes. [Donate here](https://www.paypal.me/FedericoHaag).
+
 ## Prerequisites
 
 You must have installed in your machine (higher versions are fine):
@@ -112,9 +114,11 @@ Federico:::Haag:::Politecnico di Milano:::Computer Science,Management:::01/10/20
 
 ## Common problems in Running
 
-Running for the first time one of the two py scripts you may get an error message similar to the following:
-```selenium.common.exceptions.WebDriverException: Message: unknown error: cannot find Chrome binary```.
-If this happens, please execute again `configurator.py` and be sure to specify a correct path to your chrome.exe executable in Windows or the chrome folder in Linux.
+In case you get an error message similar to the following:
+```
+selenium.common.exceptions.WebDriverException: Message: unknown error: cannot find Chrome binary
+```
+please run again `configurator.py` and be sure to specify a correct path to your chrome.exe executable in Windows or the chrome folder in Linux.
 
 ## Customizing
 
@@ -127,6 +131,8 @@ You can also customize the code in many ways:
 ## Authors
 
 * **Federico Haag** - [LinkedIn](https://www.linkedin.com/in/federicohaag/) - [Medium](https://medium.com/@federicohaag)
+
+If this code solves you a real problem, I would be grateful if you would consider a donation to enable me in keep on developing such codes. [Donate here](https://www.paypal.me/FedericoHaag).
 
 ## Acknowledgments
 
