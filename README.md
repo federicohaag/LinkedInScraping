@@ -128,7 +128,7 @@ This happens when you inserted in the input file a Profile URL which is not corr
 
 Here some tips:
 * The profile URL should always end with `/`
-* Open a browser window and navigate to such URL. Wait for the page loading. Is the URL at the top of the browser's window the same as the one you initially inserted? If not, you should insert in the input file the one you see now at the navigation bar.
+* Open a browser window and navigate to such URL. Wait for the page to load. Is the URL currently in the browser navigation bar the same as the one you initially inserted? If not, you should insert in the input file the one you see now at the navigation bar.
 
 ## Customizing
 
