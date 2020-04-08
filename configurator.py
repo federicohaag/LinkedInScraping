@@ -2,12 +2,22 @@ import os
 from configparser import ConfigParser
 from sys import platform
 
+import pyttsx3
+
 config = ConfigParser()
 
 config.add_section('system')
 config.add_section('linkedin')
 config.add_section('profiles_data')
 config.add_section('profiles_data_by_name')
+
+try:
+    engine = pyttsx3.init()
+    engine.say('Welcome to the configuration process.')
+    engine.runAndWait()
+    config.set('system', 'speak', 'Y')
+except:
+    config.set('system', 'speak', 'N')
 
 if platform.lower() == "linux":
     driver = 'Linux/chromedriver'

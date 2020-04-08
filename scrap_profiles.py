@@ -3,10 +3,9 @@ import xlsxwriter
 from configparser import ConfigParser
 from bs4 import BeautifulSoup
 from selenium import webdriver
-import pyttsx3
 
 from utils import linkedin_login, is_url_valid, get_months_between_dates, \
-    split_date_range, boolean_to_string_xls, date_to_string_xls, HumanCheckException
+    split_date_range, boolean_to_string_xls, date_to_string_xls, HumanCheckException, message_to_user
 
 
 class JobHistorySummary:
@@ -118,9 +117,9 @@ def scrap_profile(profile_to_scrap, delimiter: str) -> ScrapingResult:
         linkedin_login(browser, config.get('linkedin', 'username'), config.get('linkedin', 'password'))
 
         while browser.current_url != 'https://www.linkedin.com/feed/':
-            print("Waiting for user to do human check...")
-            engine.say('Please execute manual check')
-            engine.runAndWait()
+
+            message_to_user('Please execute manual check', config)
+
             time.sleep(30)
 
         return scrap_profile(profile_to_scrap, delimiter)
@@ -358,17 +357,14 @@ def compute_job_history_summary(graduation_date, job_positions_data_ranges, job_
     return summary
 
 
-# Creating instance for voice feedbacks
-engine = pyttsx3.init()
-engine.say('Starting Linkedin Scraping')
-engine.runAndWait()
-
 # Loading of configurations
 config = ConfigParser()
 config.read('config.ini')
 
 # Creation of a new instance of Chrome
 browser = webdriver.Chrome(executable_path=config.get('system', 'driver'))
+
+message_to_user('Starting Linkedin Scraping', config)
 
 # Doing login on LinkedIn
 linkedin_login(browser, config.get('linkedin', 'username'), config.get('linkedin', 'password'))
@@ -457,5 +453,4 @@ workbook.close()
 print(f"Scraping ended at {time.strftime('%H:%M:%S', time.gmtime(time.time()))}")
 print(f"Parsed {number_of_profiles} profiles in {time.strftime('%H:%M:%S', time.gmtime(time.time() - start_time))}")
 
-engine.say('Scraping ended')
-engine.runAndWait()
+message_to_user('Scraping Ended', config)
