@@ -362,6 +362,7 @@ def compute_job_history_summary(graduation_date, job_positions_data_ranges, job_
 config = ConfigParser()
 config.read('config.ini')
 
+# Linux-specific code needed to open a new window of Chrome
 if config.get('system', 'os') == 'linux':
     display = Display(visible=0, size=(800, 800))
     display.start()
