@@ -46,64 +46,95 @@ else:
 
 config.set('system', 'driver', os.path.join(os.path.abspath(os.path.dirname(__file__)), driver))
 
-print("Insert linkedin username.")
-print("> ", end="")
-config.set('linkedin', 'username', input())
+print("Insert the system path to Chrome of the current device")
+if config.get('system', 'os') == 'linux':
+    print("Suggested: /usr/bin/google-chrome-stable")
+if config.get('system', 'os') == 'macos':
+    print("Suggested: leave blank")
+if config.get('system', 'os') == 'windows':
+    print("If you don't know it, try leaving it blank, but expect with a high probability some errors will occur.")
 
-print("Insert linkedin password.")
 print("> ", end="")
-config.set('linkedin', 'password', input())
+config.set('system', 'chrome_path', input())
+
+linkedin_username = ""
+while linkedin_username == "":
+    print("Insert linkedin username.")
+    print("> ", end="")
+    linkedin_username = input()
+config.set('linkedin', 'username', linkedin_username)
+
+linkedin_password = ""
+while linkedin_password == "":
+    print("Insert linkedin password.")
+    print("> ", end="")
+    linkedin_password = input()
+config.set('linkedin', 'password', linkedin_password)
 
 print("Insert the name of the .txt file that contains people profile urls.")
 print("Notice: It doesn't matter if it doesn't exist right now.")
-print("Suggested: profiles_data.txt")
+print("Leave blank for default option (profiles_data.txt)")
 print("> ", end="")
 input_file_name = input()
+input_file_name = input_file_name if not input_file_name == "" else "profiles_data.txt"
 config.set('profiles_data', 'input_file_name', input_file_name)
 with open(input_file_name, "w"):
     pass
 
 print("Insert the delimiter used between profile url and graduation date. If no graduation dates are present, "
       "just insert a random string.")
-print("Suggested: :::")
+print("Leave blank for default option (:::)")
 print("> ", end="")
-config.set('profiles_data', 'delimiter', input())
+delimiter = input()
+delimiter = delimiter if not delimiter == "" else ":::"
+config.set('profiles_data', 'delimiter', delimiter)
 
 print("Insert the name of the .xlsx file that will contain the results of the scraping by profile url.")
-print("Suggested: results_profiles.xlsx")
+print("SLeave blank for default option (results_profiles.xlsx)")
 print("> ", end="")
-config.set('profiles_data', 'output_file_name', input())
+output_file_name = input()
+output_file_name = output_file_name if not output_file_name == "" else "results_profiles.xlsx"
+config.set('profiles_data', 'output_file_name', output_file_name)
 
 print("Do you want to append to it the timestamp in order to prevent to overwrite past results?")
 print("Y for yes, N for no")
-print("Suggested: Y")
+print("Leave blank for default option (Y)")
 print("> ", end="")
-config.set('profiles_data', 'append_timestamp', input())
+append_timestamp = input()
+append_timestamp = append_timestamp if not append_timestamp == "" else "Y"
+config.set('profiles_data', 'append_timestamp', append_timestamp)
 
 print("Insert the file name containing people names.")
 print("Notice: It doesn't matter if it doesn't exist right now.")
-print("Suggested: profiles_names.txt")
+print("Leave blank for default option (profiles_names.txt)")
 print("> ", end="")
 input_file_name = input()
+input_file_name = input_file_name if not input_file_name == "" else "profiles_names.txt"
 config.set('profiles_data_by_name', 'input_file_name', input_file_name)
 with open(input_file_name, "w"):
     pass
 
 print("Insert the delimiter used between people first name, last name, graduation date.")
-print("Suggested: :::")
+print("Leave blank for default option (:::)")
 print("> ", end="")
-config.set('profiles_data_by_name', 'delimiter', input())
+delimiter = input()
+delimiter = delimiter if not delimiter == "" else ":::"
+config.set('profiles_data_by_name', 'delimiter', delimiter)
 
 print("Insert the name of the .xlsx file that will contain the results of the scraping by profile names.")
-print("Suggested: results_profiles_by_name.xlsx")
+print("Leave blank for default option (results_profiles_by_name.xlsx)")
 print("> ", end="")
-config.set('profiles_data_by_name', 'output_file_name', input())
+output_file_name = input()
+output_file_name = output_file_name if not output_file_name == "" else "results_profiles_by_name.xlsx"
+config.set('profiles_data_by_name', 'output_file_name', output_file_name)
 
 print("Do you want to append to it the timestamp in order to prevent to overwrite past results?")
 print("Y for yes, N for no")
-print("Suggested: Y")
+print("Leave blank for default option (Y)")
 print("> ", end="")
-config.set('profiles_data_by_name', 'append_timestamp', input())
+append_timestamp = input()
+append_timestamp = append_timestamp if not append_timestamp == "" else "Y"
+config.set('profiles_data_by_name', 'append_timestamp', append_timestamp)
 
 with open('config.ini', 'w') as f:
     config.write(f)

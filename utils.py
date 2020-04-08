@@ -3,6 +3,7 @@ import re
 import time
 
 import pyttsx3
+from selenium import webdriver
 
 
 class HumanCheckException(Exception):
@@ -95,3 +96,24 @@ def message_to_user(message, config):
         engine = pyttsx3.init()
         engine.say(message)
         engine.runAndWait()
+
+
+def get_options(config):
+
+    print("Type YES if you want to run the scraping without seeing the Chrome window.")
+    print("> ", end="")
+    headless_option = input() == "YES"
+
+    options = webdriver.ChromeOptions()
+
+    options.add_argument('--no-sandbox')
+
+    if headless_option:
+        options.add_argument('--headless')
+
+    options.add_argument('--disable-dev-shm-usage')
+
+    if not config.get('system', 'chrome_path') == '':
+        options.binary_location = r"" + config.get('system', 'chrome_path')
+
+    return options

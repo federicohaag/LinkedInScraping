@@ -4,7 +4,7 @@ from configparser import ConfigParser
 import xlsxwriter
 from pyvirtualdisplay import Display
 from selenium import webdriver
-from utils import linkedin_login, message_to_user
+from utils import linkedin_login, message_to_user, get_options
 
 waiting_time_to_load_page = 1
 waiting_time_to_load_results = 5
@@ -18,7 +18,7 @@ if config.get('system', 'os') == 'linux':
     display.start()
 
 # Creation of a new instance of Chrome
-browser = webdriver.Chrome(executable_path=config.get('system', 'driver'))
+browser = webdriver.Chrome(executable_path=config.get('system', 'driver'), options=get_options(config))
 
 # Doing login on LinkedIn
 linkedin_login(browser, config.get('linkedin', 'username'), config.get('linkedin', 'password'))

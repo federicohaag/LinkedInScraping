@@ -3,11 +3,10 @@ import xlsxwriter
 from configparser import ConfigParser
 from bs4 import BeautifulSoup
 from selenium import webdriver
-
-from utils import linkedin_login, is_url_valid, get_months_between_dates, \
-    split_date_range, boolean_to_string_xls, date_to_string_xls, HumanCheckException, message_to_user
-
 from pyvirtualdisplay import Display
+from utils import linkedin_login, is_url_valid, get_months_between_dates, \
+    split_date_range, boolean_to_string_xls, date_to_string_xls, HumanCheckException, message_to_user, get_options
+
 
 class JobHistorySummary:
     def __init__(self, had_job_while_studying=None, had_job_after_graduation=None,
@@ -368,7 +367,7 @@ if config.get('system', 'os') == 'linux':
     display.start()
 
 # Creation of a new instance of Chrome
-browser = webdriver.Chrome(executable_path=config.get('system', 'driver'))
+browser = webdriver.Chrome(executable_path=config.get('system', 'driver'), options=get_options(config))
 
 message_to_user('Starting Linkedin Scraping', config)
 

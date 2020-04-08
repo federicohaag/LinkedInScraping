@@ -34,11 +34,10 @@ I understand the request for LinkedIn username and password could be scary, unfo
 
 ## Executing
 
-Every time you execute a scraping, a new Google Chrome window will be opened. **Please don't lose the focus on it.**
+There are two ways you can run the code:
+* **Headless** execution will do scraping without opening a real Chrome window. In this way you can keep on doing your regular business on your computer, but be aware that if you scrap many profiles (more than hundreds) and/or in unusual times (in the night) LinkedIn may prompt a Captcha to check that you are not a human. If this happens, there is no way for you to fill in the Captcha and all the work done by the script will be wasted as the only way out is to kill the python process.
+* **Normal** execution will do scraping opening a real Chrome window. In this case you will be able - if prompted - to satisfy the Captcha check and to proceed the scraping. The python script is trained on this situation and will perfectly manage it alerting you. On the other side, be aware that if you choose this mode you can not loose the focus on the window, otherwise no data will be scraped. Be carefull especially of sleeping mode your computer may enter. For MacOS I suggest [Amphetamine](https://apps.apple.com/it/app/amphetamine/id937984704?mt=12).
 
-You can leave alone the computer but be sure it won't enter sleep mode (for MacOS: [Amphetamine](https://apps.apple.com/it/app/amphetamine/id937984704?mt=12)).
-
-If for any reason the computer enter sleep mode, or you loose the focus on the window, the script will keep on but won't scrap any data. Hence, be really carefull if at the end of the scraping process you end up with profiles that seem to have no data: it may have been this case.
 
 ### Human Check by LinkedIn ###
 
