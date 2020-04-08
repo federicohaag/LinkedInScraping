@@ -4,7 +4,7 @@ from configparser import ConfigParser
 import pyttsx3
 import xlsxwriter
 from selenium import webdriver
-from utils import linkedin_login
+from utils import linkedin_login, message_to_user
 
 waiting_time_to_load_page = 1
 waiting_time_to_load_results = 5
@@ -19,8 +19,7 @@ browser = webdriver.Chrome(executable_path=config.get('system', 'driver'))
 # Doing login on LinkedIn
 linkedin_login(browser, config.get('linkedin', 'username'), config.get('linkedin', 'password'))
 
-engine = pyttsx3.init()
-engine.say('Avvio lettura profili Linkedin')
+message_to_user('Starting reading Linkedin profiles')
 
 results = []
 for query in open(config.get('profiles_data_by_name', 'input_file_name'), "r"):
@@ -156,8 +155,9 @@ for query in open(config.get('profiles_data_by_name', 'input_file_name'), "r"):
         except Exception as e:
             if 'Unable to locate element: {"method":"css selector","selector":".search-global-typeahead__input"}' in e.__str__():
                 needToLoop = True
-                engine.say('Please execute manual check')
-                engine.runAndWait()
+
+                message_to_user('Please execute manual check')
+
                 time.sleep(10)
             else:
                 needToLoop = False
@@ -194,3 +194,5 @@ for r in results:
     worksheet.write(xls_row, 3, r[3])
     xls_row += 1
 workbook.close()
+
+message_to_user('Search of profiles ended.')
