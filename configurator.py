@@ -16,7 +16,7 @@ try:
     engine.say('Welcome to the configuration process.')
     engine.runAndWait()
     config.set('system', 'speak', 'Y')
-except:
+except OSError:
     config.set('system', 'speak', 'N')
 
 if platform.lower() == "linux":
