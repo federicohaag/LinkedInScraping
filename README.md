@@ -114,11 +114,21 @@ Federico:::Haag:::Politecnico di Milano:::Computer Science,Management:::01/10/20
 
 ## Common problems in Running
 
+### Selenium WebDriverException
 In case you get an error message similar to the following:
 ```
 selenium.common.exceptions.WebDriverException: Message: unknown error: cannot find Chrome binary
 ```
 please run again `configurator.py` and be sure to specify a correct path to your chrome.exe executable in Windows or the chrome folder in Linux.
+
+### Human check freezing the scraping
+It may happen that while scraping the script will warn you about the need to perform a Human Check (a Google Captcha) even if it's not prompted for real.
+
+This happens when you inserted in the input file a Profile URL which is not correctly formatted.
+
+Here some tips:
+* The profile URL should always end with `/`
+* Open a browser window and navigate to such URL. Wait for the page loading. Is the URL at the top of the browser's window the same as the one you initially inserted? If not, you should insert in the input file the one you see now at the navigation bar.
 
 ## Customizing
 
