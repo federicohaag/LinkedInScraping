@@ -107,7 +107,7 @@ Federico:::Haag:::Politecnico di Milano:::Computer Science,Management:::01/10/20
 
 ## Common problems in Running
 
-Especially if based on Windows, you may get this error message:
+Running for the first time one of the two py scripts you may get an error message similar to the following:
 ```selenium.common.exceptions.WebDriverException: Message: unknown error: cannot find Chrome binary```.
 If this happens, please replace the code lines containing:
 ```
@@ -119,7 +119,7 @@ options = webdriver.ChromeOptions()
 options.binary_location = r"<YOUR_CHROME_PATH>\chrome.exe" 
 browser = webdriver.Chrome(executable_path=config.get('system', 'driver'), chrome_options=options)
 ```
-Please consider that `<YOUR_CHROME_PATH>` has to be replaced with the actual path to your chrome.exe executable.
+Please consider that `<YOUR_CHROME_PATH>` has to be replaced with the actual path to your chrome.exe executable in Windows or the chrome folder in Linux.
 
 ## Customizing
 
