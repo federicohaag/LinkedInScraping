@@ -1,8 +1,8 @@
 import time
 from configparser import ConfigParser
 
-import pyttsx3
 import xlsxwriter
+from pyvirtualdisplay import Display
 from selenium import webdriver
 from utils import linkedin_login, message_to_user
 
@@ -12,6 +12,10 @@ waiting_time_to_load_results = 5
 # Loading of configurations
 config = ConfigParser()
 config.read('config.ini')
+
+if config.get('system', 'os') == 'linux':
+    display = Display(visible=0, size=(800, 800))
+    display.start()
 
 # Creation of a new instance of Chrome
 browser = webdriver.Chrome(executable_path=config.get('system', 'driver'))
