@@ -39,6 +39,8 @@ I understand the request for LinkedIn username and password could be scary, unfo
 
 There are two ways you can run the code: headless execution and normal one.
 
+In both cases, be careful (especially when you scrap a lot of profiles) because your computer may enter sleep mode. In sleep mode the scraping could not work. For MacOS I suggest [Amphetamine](https://apps.apple.com/it/app/amphetamine/id937984704?mt=12).
+
 ### Headless execution
 In this mode the script will do scraping without opening a real Chrome window.
 
@@ -51,7 +53,7 @@ In this mode the script will do scraping opening a real Chrome window.
 
 **Pros:** In this case you will be able - if prompted - to satisfy the Captcha check and to proceed the scraping. The python script is trained on this situation and will perfectly manage it alerting you.
 
-**Cons:** Be aware that if you choose this mode you can not loose the focus on the window, otherwise no data will be scraped. Be carefull especially of sleeping mode your computer may enter. For MacOS I suggest [Amphetamine](https://apps.apple.com/it/app/amphetamine/id937984704?mt=12).
+**Cons:** Be aware that if you choose this mode you can not loose the focus on the window, otherwise no data will be scraped.
 
 
 ## Running Scraping by Profile URL
