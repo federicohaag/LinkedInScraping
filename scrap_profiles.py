@@ -5,7 +5,8 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from pyvirtualdisplay import Display
 from utils import linkedin_login, is_url_valid, get_months_between_dates, \
-    split_date_range, boolean_to_string_xls, date_to_string_xls, HumanCheckException, message_to_user, get_options
+    split_date_range, boolean_to_string_xls, date_to_string_xls, HumanCheckException, message_to_user, get_options, \
+    linkedin_logout
 
 
 class JobHistorySummary:
@@ -113,6 +114,8 @@ def scrap_profile(profile_to_scrap, delimiter: str) -> ScrapingResult:
     try:
         return get_profile_data(profile_linkedin_url, profile_known_graduation_date)
     except HumanCheckException:
+
+        linkedin_logout(browser)
 
         linkedin_login(browser, config.get('linkedin', 'username'), config.get('linkedin', 'password'))
 
