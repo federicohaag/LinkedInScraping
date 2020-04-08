@@ -90,10 +90,8 @@ def date_to_string_xls(date):
 
 def message_to_user(message, config):
     print(message)
-    try:
-        if config.get('system', 'speak') == 'Y':
-            engine = pyttsx3.init()
-            engine.say(message)
-            engine.runAndWait()
-    except configparser.NoOptionError:  # guarantee compatibility with previous version
-        pass
+
+    if config.get('system', 'speak') == 'Y':
+        engine = pyttsx3.init()
+        engine.say(message)
+        engine.runAndWait()
