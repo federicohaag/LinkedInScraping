@@ -21,10 +21,13 @@ except OSError:
 
 if platform.lower() == "linux":
     driver = 'Linux/chromedriver'
+    config.set('system','os','linux')
 elif platform.lower() == "darwin":
     driver = 'MacOS/chromedriver'
+    config.set('system', 'os', 'macos')
 elif platform.lower() == "windows":
     driver = 'Windows/chromedriver.exe'
+    config.set('system', 'os', 'windows')
 else:
     this_os = ""
     while this_os not in ["Linux", "MacOS", "Windows"]:
@@ -33,10 +36,13 @@ else:
         this_os = input()
     if this_os == "Linux":
         driver = 'Linux/chromedriver'
+        config.set('system', 'os', 'linux')
     elif this_os == "MacOS":
         driver = 'MacOS/chromedriver'
+        config.set('system', 'os', 'macos')
     else:
         driver = 'Windows/chromedriver.exe'
+        config.set('system', 'os', 'windows')
 
 config.set('system', 'driver', os.path.join(os.path.abspath(os.path.dirname(__file__)), driver))
 

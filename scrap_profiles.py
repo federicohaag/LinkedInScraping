@@ -7,6 +7,7 @@ from selenium import webdriver
 from utils import linkedin_login, is_url_valid, get_months_between_dates, \
     split_date_range, boolean_to_string_xls, date_to_string_xls, HumanCheckException, message_to_user
 
+from pyvirtualdisplay import Display
 
 class JobHistorySummary:
     def __init__(self, had_job_while_studying=None, had_job_after_graduation=None,
@@ -360,6 +361,10 @@ def compute_job_history_summary(graduation_date, job_positions_data_ranges, job_
 # Loading of configurations
 config = ConfigParser()
 config.read('config.ini')
+
+if config.get('system', 'os') == 'linux':
+    display = Display(visible=0, size=(800, 800))
+    display.start()
 
 # Creation of a new instance of Chrome
 browser = webdriver.Chrome(executable_path=config.get('system', 'driver'))
