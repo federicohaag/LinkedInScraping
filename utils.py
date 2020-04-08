@@ -1,8 +1,6 @@
-import configparser
 import re
-import time
-
 import pyttsx3
+from datetime import datetime
 from selenium import webdriver
 
 
@@ -52,27 +50,31 @@ def split_date_range(date_range):
     return [begin, end]
 
 
-def get_today_date():
-    return time.strptime(time.strftime('%d %m %y'), '%d %m %y')
-
-
 def parse_date(date_str):
     if date_str == 'Present':
-        return get_today_date()
+        return datetime.today()
 
     try:
-        date = time.strptime(date_str, '%b %Y')
+        date = datetime.strptime(date_str, '%b %Y')
         return date
     except ValueError:
         try:
-            date = time.strptime(date_str, '%Y')
+            date = datetime.strptime(date_str, '%Y')
             return date
         except ValueError:
             return None
 
 
-def get_months_between_dates(earlier_date, later_date):
-    return (time.mktime(later_date) - time.mktime(earlier_date)) // 2592000
+def get_months_between_dates(date1, date2):
+
+    if date1 < date2:
+        diff = date2 - date1
+    elif date1 > date2:
+        diff = date1 - date2
+    else:
+        return 0
+
+    return diff.days // 30
 
 
 def boolean_to_string_xls(boolean_value):
@@ -86,7 +88,7 @@ def date_to_string_xls(date):
     if date is None:
         return 'N/A'
 
-    return time.strftime("%b-%y", date)
+    return datetime.strftime(date, "%b-%y")
 
 
 def message_to_user(message, config):

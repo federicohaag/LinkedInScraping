@@ -1,3 +1,4 @@
+from datetime import datetime
 import time
 import xlsxwriter
 from configparser import ConfigParser
@@ -12,18 +13,17 @@ from utils import linkedin_login, is_url_valid, get_months_between_dates, \
 class JobHistorySummary:
     def __init__(self, had_job_while_studying=None, had_job_after_graduation=None,
                  had_job_after_graduation_within_3_months=None, had_job_after_graduation_within_5_months=None,
-                 had_job_while_studying_warning_short_duration=None, date_first_job_ever=None,
-                 date_first_job_after_beginning_university=None, date_first_job_after_ending_university=None,
-                 jobs_now=None):
+                 had_job_after_graduation_within_6_months=None, date_first_job_after_beginning_university=None,
+                 date_first_job_after_ending_university=None, jobs_now=None, first_job_ever_date=None, jobs=None):
         self.had_job_while_studying = had_job_while_studying
         self.had_job_after_graduation = had_job_after_graduation
         self.had_job_after_graduation_within_3_months = had_job_after_graduation_within_3_months
         self.had_job_after_graduation_within_5_months = had_job_after_graduation_within_5_months
-        self.had_job_while_studying_warning_short_duration = had_job_while_studying_warning_short_duration
-        self.date_first_job_ever = date_first_job_ever
+        self.had_job_after_graduation_within_6_months = had_job_after_graduation_within_6_months
         self.date_first_job_after_beginning_university = date_first_job_after_beginning_university
         self.date_first_job_after_ending_university = date_first_job_after_ending_university
         self.jobs_now = jobs_now
+        self.first_job_ever_date = first_job_ever_date
 
         if jobs_now is None:
             self.more_than_a_job_now = None
@@ -31,6 +31,11 @@ class JobHistorySummary:
         else:
             self.more_than_a_job_now = jobs_now > 1
             self.is_currently_unemployed = jobs_now == 0
+
+        if jobs is None:
+            self.never_had_jobs = False
+        else:
+            self.never_had_jobs = len(jobs) == 0
 
 
 class Location:
@@ -102,7 +107,7 @@ def scrap_profile(profile_to_scrap, delimiter: str) -> ScrapingResult:
     if delimiter in profile_to_scrap:
         profile_data = profile_to_scrap.split(delimiter)
         profile_linkedin_url = profile_data[0]
-        profile_known_graduation_date = time.strptime('/'.join(profile_data[1].strip().split("/")[1:]), '%m/%y')
+        profile_known_graduation_date = datetime.strptime('/'.join(profile_data[1].strip().split("/")[1:]), '%m/%y')
     else:
         profile_linkedin_url = profile_to_scrap
         profile_known_graduation_date = None
@@ -114,6 +119,8 @@ def scrap_profile(profile_to_scrap, delimiter: str) -> ScrapingResult:
     try:
         return get_profile_data(profile_linkedin_url, profile_known_graduation_date)
     except HumanCheckException:
+
+        print("Human")
 
         linkedin_logout(browser)
 
@@ -138,7 +145,9 @@ def get_profile_data(profile_linkedin_url, known_graduation_date):
     # Opening of the profile page
     browser.get(profile_linkedin_url)
 
-    if browser.current_url != profile_linkedin_url:
+    if not str(browser.current_url).strip() == profile_linkedin_url.strip():
+        print(browser.current_url)
+        print(profile_linkedin_url)
         if browser.current_url == 'https://www.linkedin.com/in/unavailable/':
             return ScrapingResult('ProfileUnavailable')
         else:
@@ -299,9 +308,10 @@ def get_profile_data(profile_linkedin_url, known_graduation_date):
 
 # Returns a 'summary' of the job history of the person with reference to the known graduation_date
 def compute_job_history_summary(graduation_date, job_positions_data_ranges, job_experiences) -> JobHistorySummary:
-    jobs_now = 0
-    for job_experience in job_experiences:
 
+    jobs_now = 0
+
+    for job_experience in job_experiences:
         found_present = False
         for d_range in job_experience.find_elements_by_class_name('pv-entity__date-range'):
             found_present = found_present or ('present' in d_range.text.lower())
@@ -312,50 +322,60 @@ def compute_job_history_summary(graduation_date, job_positions_data_ranges, job_
         had_job_after_graduation=False,
         had_job_after_graduation_within_3_months=False,
         had_job_after_graduation_within_5_months=False,
+        had_job_after_graduation_within_6_months=False,
         had_job_while_studying=False,
-        had_job_while_studying_warning_short_duration=False,
-        jobs_now=jobs_now
+        jobs_now=jobs_now,
+        jobs=job_experiences
     )
 
     if graduation_date is not None and len(job_positions_data_ranges) > 0:
+
+        beginning_of_university = datetime.fromtimestamp(datetime.timestamp(graduation_date) - 63072000)
+        three_months_after_graduation_date = datetime.fromtimestamp(datetime.timestamp(graduation_date) + 7776000)
+        five_months_after_graduation_date = datetime.fromtimestamp(datetime.timestamp(graduation_date) + 12960000)
+        six_months_after_graduation_date = datetime.fromtimestamp(datetime.timestamp(graduation_date) + 15552000)
 
         for date_range in job_positions_data_ranges:
 
             # Split the date range into the two initial and ending date
             initial_date, end_date = split_date_range(date_range)
 
-            if summary.date_first_job_ever is None or initial_date < summary.date_first_job_ever:
-                summary.date_first_job_ever = initial_date
+            if summary.first_job_ever_date is None:
+                summary.first_job_ever_date = initial_date
+            else:
+                if initial_date < summary.first_job_ever_date:
+                    summary.first_job_ever_date = initial_date
 
             # Checking if was working while studying
-            if initial_date < graduation_date:
+            if beginning_of_university <= initial_date <= graduation_date:
+                summary.had_job_while_studying = True
 
-                if end_date >= graduation_date or get_months_between_dates(earlier_date=end_date,
-                                                                           later_date=graduation_date) < 24:
-                    summary.had_job_while_studying = True
+            if initial_date >= beginning_of_university:
 
-                    if get_months_between_dates(earlier_date=initial_date, later_date=graduation_date) <= 3:
-                        summary.had_job_while_studying_warning_short_duration = True
-
-                if get_months_between_dates(earlier_date=initial_date, later_date=graduation_date) < 24:
-                    if summary.date_first_job_after_beginning_university is None \
-                            or initial_date < summary.date_first_job_after_beginning_university:
+                if summary.date_first_job_after_beginning_university is None:
+                    summary.date_first_job_after_beginning_university = initial_date
+                else:
+                    if initial_date < summary.date_first_job_after_beginning_university:
                         summary.date_first_job_after_beginning_university = initial_date
 
-            else:
+            if initial_date <= graduation_date <= end_date:
                 summary.had_job_after_graduation = True
-                if get_months_between_dates(earlier_date=graduation_date, later_date=initial_date) <= 3:
-                    summary.had_job_after_graduation_within_3_months = True
-                else:
-                    if get_months_between_dates(earlier_date=graduation_date, later_date=initial_date) <= 5:
-                        summary.had_job_after_graduation_within_5_months = True
 
-                if summary.date_first_job_after_ending_university is None or \
-                        initial_date < summary.date_first_job_after_ending_university:
+            if initial_date > graduation_date:
+                if summary.date_first_job_after_ending_university is None:
                     summary.date_first_job_after_ending_university = initial_date
+                else:
+                    if initial_date < summary.date_first_job_after_ending_university:
+                        summary.date_first_job_after_ending_university = initial_date
 
-            if summary.date_first_job_after_beginning_university is None:
-                summary.date_first_job_after_beginning_university = summary.date_first_job_after_ending_university
+            if initial_date <= three_months_after_graduation_date <= end_date:
+                summary.had_job_after_graduation_within_3_months = True
+
+            if initial_date <= five_months_after_graduation_date <= end_date:
+                summary.had_job_after_graduation_within_5_months = True
+
+            if initial_date <= six_months_after_graduation_date <= end_date:
+                summary.had_job_after_graduation_within_6_months = True
 
     return summary
 
@@ -387,6 +407,7 @@ count = 1
 for profile_data in open(config.get('profiles_data', 'input_file_name'), "r"):
 
     # Print statistics about ending time of the script
+
     ending_in = time.strftime("%H:%M:%S",
                               time.gmtime(((time.time() - start_time) / count) * (number_of_profiles - count)))
     print(f"Scraping profile {count} / {number_of_profiles} - {ending_in} left")
@@ -413,11 +434,10 @@ if config.get('profiles_data', 'append_timestamp') == 'Y':
 workbook = xlsxwriter.Workbook(output_file_name)
 worksheet = workbook.add_worksheet()
 
-headers = ['Name', 'Email', 'Skills', 'Company', 'Job Title', 'City', 'Country', 'Full Location', 'Industry',
-           'Working while studying', 'Found job after graduation', 'Found job within 3 months',
-           'Found job within 5 months', 'Short Job While Studying', 'DATE FIRST JOB EVER',
-           'DATE FIRST JOB AFTER BEGINNING POLIMI', 'DATE FIRST JOB AFTER ENDING POLIMI', 'MORE THAN ONE JOB POSITION',
-           'NO JOB NOW']
+headers = ['Name', 'Email', 'Skills', 'Company', 'Industry', 'Job Title', 'City', 'Country', 'Full Location',
+            'DATE FIRST JOB EVER', 'DATE FIRST JOB AFTER BEGINNING POLIMI', 'DATE FIRST JOB AFTER ENDING POLIMI',
+           'JOB WITHIN 3 MONTHS', 'JOB WITHIN 5 MONTHS', 'JOB WITHIN 6 MONTHS', 'JOB WHILE STUDYING',
+           'MORE THAN ONE JOB POSITION', 'NOT CURRENTLY EMPLOYED', 'NEVER HAD JOBS']
 
 # Set the headers of xls file
 for h in range(len(headers)):
@@ -436,21 +456,21 @@ for i in range(len(scraping_results)):
             p.email,
             ",".join(p.skills),
             p.current_job.company.name,
+            p.current_job.company.industry,
             p.current_job.position,
             p.current_job.location.city,
             p.current_job.location.country,
             p.current_job.location.full_string,
-            p.current_job.company.industry,
-            boolean_to_string_xls(p.jobs_history.had_job_while_studying),
-            boolean_to_string_xls(p.jobs_history.had_job_after_graduation),
-            boolean_to_string_xls(p.jobs_history.had_job_after_graduation_within_3_months),
-            boolean_to_string_xls(p.jobs_history.had_job_after_graduation_within_5_months),
-            boolean_to_string_xls(p.jobs_history.had_job_while_studying_warning_short_duration),
-            date_to_string_xls(p.jobs_history.date_first_job_ever),
+            date_to_string_xls(p.jobs_history.first_job_ever_date),
             date_to_string_xls(p.jobs_history.date_first_job_after_beginning_university),
             date_to_string_xls(p.jobs_history.date_first_job_after_ending_university),
+            boolean_to_string_xls(p.jobs_history.had_job_after_graduation_within_3_months),
+            boolean_to_string_xls(p.jobs_history.had_job_after_graduation_within_5_months),
+            boolean_to_string_xls(p.jobs_history.had_job_after_graduation_within_6_months),
+            boolean_to_string_xls(p.jobs_history.had_job_while_studying),
             boolean_to_string_xls(p.jobs_history.more_than_a_job_now),
-            boolean_to_string_xls(p.jobs_history.is_currently_unemployed)
+            boolean_to_string_xls(p.jobs_history.is_currently_unemployed),
+            boolean_to_string_xls(p.jobs_history.never_had_jobs)
         ]
 
     for j in range(len(data)):
