@@ -434,7 +434,7 @@ if config.get('profiles_data', 'append_timestamp') == 'Y':
 workbook = xlsxwriter.Workbook(output_file_name)
 worksheet = workbook.add_worksheet()
 
-headers = ['Name', 'Email', 'Skills', 'Company', 'Industry', 'Job Title', 'City', 'Country', 'Full Location',
+headers = ['Name', 'Email', 'Skills', 'Company', 'Industry', 'Job Title', 'City', 'Country',
             'DATE FIRST JOB EVER', 'DATE FIRST JOB AFTER BEGINNING POLIMI', 'DATE FIRST JOB AFTER ENDING POLIMI',
            'JOB WITHIN 3 MONTHS', 'JOB WITHIN 5 MONTHS', 'JOB WITHIN 6 MONTHS', 'JOB WHILE STUDYING',
            'MORE THAN ONE JOB POSITION', 'NOT CURRENTLY EMPLOYED', 'NEVER HAD JOBS']
@@ -460,7 +460,6 @@ for i in range(len(scraping_results)):
             p.current_job.position,
             p.current_job.location.city,
             p.current_job.location.country,
-            p.current_job.location.full_string,
             date_to_string_xls(p.jobs_history.first_job_ever_date),
             date_to_string_xls(p.jobs_history.date_first_job_after_beginning_university),
             date_to_string_xls(p.jobs_history.date_first_job_after_ending_university),
