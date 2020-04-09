@@ -148,8 +148,6 @@ def get_profile_data(profile_linkedin_url, known_graduation_date):
     browser.get(profile_linkedin_url)
 
     if not str(browser.current_url).strip() == profile_linkedin_url.strip():
-        print(browser.current_url)
-        print(profile_linkedin_url)
         if browser.current_url == 'https://www.linkedin.com/in/unavailable/':
             return ScrapingResult('ProfileUnavailable')
         else:
