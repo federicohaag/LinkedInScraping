@@ -48,6 +48,11 @@ In this mode the script will do scraping without opening a real Chrome window.
 
 **Cons:** If you scrap many profiles (more than hundreds) and/or in unusual times (in the night) LinkedIn may prompt a Captcha to check that you are not a human. If this happens, there is no way for you to fill in the Captcha and all the work done by the script will be wasted as the only way out is to kill the python process.
 
+To run in headless mode:
+```
+python scrap_profiles.py HEADLESS
+```
+
 ### Normal execution
 In this mode the script will do scraping opening a real Chrome window.
 
@@ -55,6 +60,10 @@ In this mode the script will do scraping opening a real Chrome window.
 
 **Cons:** Be aware that if you choose this mode you can not loose the focus on the window, otherwise no data will be scraped.
 
+To run in normal mode:
+```
+python scrap_profiles.py
+```
 
 ## Running Scraping by Profile URL
 
