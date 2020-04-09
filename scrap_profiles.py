@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime
 import time
 import xlsxwriter
@@ -389,8 +390,10 @@ if config.get('system', 'os') == 'linux':
     display = Display(visible=0, size=(800, 800))
     display.start()
 
+headless_option = len(sys.argv) >= 2 and sys.argv[1] == 'HEADLESS'
+
 # Creation of a new instance of Chrome
-browser = webdriver.Chrome(executable_path=config.get('system', 'driver'), options=get_options(config))
+browser = webdriver.Chrome(executable_path=config.get('system', 'driver'), options=get_options(headless_option, config))
 
 message_to_user('Starting Linkedin Scraping', config)
 

@@ -100,11 +100,7 @@ def message_to_user(message, config):
         engine.runAndWait()
 
 
-def get_options(config):
-
-    print("Type YES if you want to run the scraping without seeing the Chrome window.")
-    print("> ", end="")
-    headless_option = input() == "YES"
+def get_options(headless_option, config):
 
     options = webdriver.ChromeOptions()
 

@@ -1,3 +1,4 @@
+import sys
 import time
 from configparser import ConfigParser
 
@@ -17,8 +18,10 @@ if config.get('system', 'os') == 'linux':
     display = Display(visible=0, size=(800, 800))
     display.start()
 
+headless_option = len(sys.argv) >= 2 and sys.argv[1] == 'HEADLESS'
+
 # Creation of a new instance of Chrome
-browser = webdriver.Chrome(executable_path=config.get('system', 'driver'), options=get_options(config))
+browser = webdriver.Chrome(executable_path=config.get('system', 'driver'), options=get_options(headless_option, config))
 
 # Doing login on LinkedIn
 linkedin_login(browser, config.get('linkedin', 'username'), config.get('linkedin', 'password'))
