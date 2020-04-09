@@ -224,8 +224,6 @@ def get_profile_data(profile_linkedin_url, known_graduation_date):
     except:
         skills = []
 
-    print(skills)
-
     # Parsing the job positions
     if len(list_of_job_positions) > 0:
 
