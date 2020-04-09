@@ -108,7 +108,7 @@ def scrap_profile(profile_to_scrap, delimiter: str) -> ScrapingResult:
     if delimiter in profile_to_scrap:
         profile_data = profile_to_scrap.split(delimiter)
         profile_linkedin_url = profile_data[0]
-        profile_known_graduation_date = datetime.strptime('/'.join(profile_data[1].strip().split("/")[1:]), '%m/%y')
+        profile_known_graduation_date = datetime.strptime(profile_data[1].strip(), '%d/%m/%y')
     else:
         profile_linkedin_url = profile_to_scrap
         profile_known_graduation_date = None
@@ -121,7 +121,8 @@ def scrap_profile(profile_to_scrap, delimiter: str) -> ScrapingResult:
         return get_profile_data(profile_linkedin_url, profile_known_graduation_date)
     except HumanCheckException:
 
-        print("Human")
+        if headless_option:
+            return ScrapingResult('HumanCheckActivatedInHeadlessMode')
 
         linkedin_logout(browser)
 
@@ -329,15 +330,17 @@ def compute_job_history_summary(graduation_date, job_positions_data_ranges, job_
 
     if graduation_date is not None and len(job_positions_data_ranges) > 0:
 
-        beginning_of_university = datetime.fromtimestamp(datetime.timestamp(graduation_date) - 63072000)
-        three_months_after_graduation_date = datetime.fromtimestamp(datetime.timestamp(graduation_date) + 7776000)
-        five_months_after_graduation_date = datetime.fromtimestamp(datetime.timestamp(graduation_date) + 12960000)
-        six_months_after_graduation_date = datetime.fromtimestamp(datetime.timestamp(graduation_date) + 15552000)
+        beginning_of_university = datetime.fromtimestamp(datetime.timestamp(graduation_date) - 24*60*60*365*2)
+        three_months_after_graduation_date = datetime.fromtimestamp(datetime.timestamp(graduation_date) + 24*60*60*365*(3/12))
+        five_months_after_graduation_date = datetime.fromtimestamp(datetime.timestamp(graduation_date) + 24*60*60*365*(5/12))
+        six_months_after_graduation_date = datetime.fromtimestamp(datetime.timestamp(graduation_date) + 24*60*60*365*(6/12))
 
         for date_range in job_positions_data_ranges:
 
             # Split the date range into the two initial and ending date
             initial_date, end_date = split_date_range(date_range)
+
+            end_date = datetime.fromtimestamp(datetime.timestamp(end_date) + 24*60*60*31)
 
             if summary.first_job_ever_date is None:
                 summary.first_job_ever_date = initial_date
