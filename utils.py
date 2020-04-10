@@ -3,10 +3,59 @@ import pyttsx3
 from datetime import datetime
 from selenium import webdriver
 
+from job_history_summary import JobHistorySummary
+
 
 class HumanCheckException(Exception):
     """Human Check from Linkedin"""
     pass
+
+
+class CannotProceedScrapingException(Exception):
+    """Human Check from Linkedin during an headless mode execution"""
+    pass
+
+
+class Location:
+    def __init__(self, city='N/A', country='N/A', location='N/A'):
+        self.full_string = location
+        self.city = city
+        self.country = country
+
+    def parse_string(self, location):
+        self.full_string = location
+        if ',' in location:
+            # TODO: Probably useless try - except. To be checked.
+            try:
+                self.city = location.split(',')[0]
+                self.country = location.split(',')[-1]
+            except:
+                pass
+
+
+class Company:
+    def __init__(self, name='N/A', industry='N/A'):
+        self.name = name
+        self.industry = industry
+
+
+class Job:
+    def __init__(self, company=Company(), position='N/A', location=Location()):
+        self.company = company
+        self.position = position
+        self.location = location
+
+    def __set__(self, instance, value):
+        self.instance = value
+
+
+class Profile:
+    def __init__(self, profile_name, email, skills, last_job=Job(), job_history_summary=JobHistorySummary()):
+        self.profile_name = profile_name
+        self.email = email
+        self.skills = skills
+        self.current_job = last_job if not job_history_summary.is_currently_unemployed else Job()
+        self.jobs_history = job_history_summary
 
 
 def linkedin_logout(browser):
@@ -27,6 +76,11 @@ def linkedin_login(browser, username, password):
         pass
 
 
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    return [lst[i:i + n] for i in range(0, len(lst), n)]
+
+
 def is_url_valid(url):
     regex = re.compile(
         r'^(?:http|ftp)s?://'  # http:// or https://
@@ -36,33 +90,6 @@ def is_url_valid(url):
         r'(?::\d+)?'  # optional port
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
     return re.match(regex, url) is not None
-
-
-def split_date_range(date_range):
-    try:
-        dates = date_range.split(' – ')
-        begin = parse_date(dates[0])
-        end = parse_date(dates[1])
-    except IndexError:
-        begin = parse_date(date_range.strip())
-        end = begin
-
-    return [begin, end]
-
-
-def parse_date(date_str):
-    if date_str == 'Present':
-        return datetime.today()
-
-    try:
-        date = datetime.strptime(date_str, '%b %Y')
-        return date
-    except ValueError:
-        try:
-            date = datetime.strptime(date_str, '%Y')
-            return date
-        except ValueError:
-            return None
 
 
 def get_months_between_dates(date1, date2):

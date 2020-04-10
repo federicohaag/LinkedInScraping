@@ -11,9 +11,12 @@ config.add_section('linkedin')
 config.add_section('profiles_data')
 config.add_section('profiles_data_by_name')
 
+print("Welcome to the configuration process.")
+
 try:
+    print("Performing some system checks...")
     engine = pyttsx3.init()
-    engine.say('Welcome to the configuration process.')
+    engine.say(' ')
     engine.runAndWait()
     config.set('system', 'speak', 'Y')
 except OSError:
@@ -46,17 +49,6 @@ else:
 
 config.set('system', 'driver', os.path.join(os.path.abspath(os.path.dirname(__file__)), driver))
 
-print("Insert the system path to Chrome of the current device")
-if config.get('system', 'os') == 'linux':
-    print("Suggested: /usr/bin/google-chrome-stable")
-if config.get('system', 'os') == 'macos':
-    print("Suggested: leave blank")
-if config.get('system', 'os') == 'windows':
-    print("If you don't know it, try leaving it blank, but expect with a high probability some errors will occur.")
-
-print("> ", end="")
-config.set('system', 'chrome_path', input())
-
 linkedin_username = ""
 while linkedin_username == "":
     print("Insert linkedin username.")
@@ -70,6 +62,17 @@ while linkedin_password == "":
     print("> ", end="")
     linkedin_password = input()
 config.set('linkedin', 'password', linkedin_password)
+
+print("Insert the system path to Chrome of the current device")
+if config.get('system', 'os') == 'linux':
+    print("Suggested: /usr/bin/google-chrome-stable")
+if config.get('system', 'os') == 'macos':
+    print("Suggested: leave blank")
+if config.get('system', 'os') == 'windows':
+    print("If you don't know it, try leaving it blank, but expect with a high probability some errors will occur.")
+
+print("> ", end="")
+config.set('system', 'chrome_path', input())
 
 print("Insert the name of the .txt file that contains people profile urls.")
 print("Notice: It doesn't matter if it doesn't exist right now.")
@@ -136,10 +139,17 @@ append_timestamp = input()
 append_timestamp = append_timestamp if not append_timestamp == "" else "Y"
 config.set('profiles_data_by_name', 'append_timestamp', append_timestamp)
 
+print("How many threads do you want to be spawn maximum?")
+print("Leave blank for default option (4)")
+print("> ", end="")
+max_threads = input()
+max_threads = max_threads if not max_threads == "" else "4"
+config.set("system", "max_threads", max_threads)
+
 with open('config.ini', 'w') as f:
     config.write(f)
 
 print("")
-print("You can now do scraping.")
+print("Configuration completed. You can now do scraping.")
 print("To scrape profile by url: execute scrap_profiles.py")
 print("To search profiles by name: execute search_profiles_by_name.py")
