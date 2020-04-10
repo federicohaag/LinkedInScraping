@@ -33,10 +33,7 @@ class JobHistorySummary:
             self.more_than_a_job_now = jobs_now > 1
             self.is_currently_unemployed = jobs_now == 0
 
-        if jobs is None:
-            self.never_had_jobs = False
-        else:
-            self.never_had_jobs = len(jobs) == 0
+        self.never_had_jobs = (jobs is None or len(jobs) == 0)
 
 
 class Location:
@@ -250,52 +247,54 @@ def get_profile_data(profile_linkedin_url, known_graduation_date):
         div_tags = exp_section.find('div')
         a_tags = div_tags.find('a')
 
-        # Scraping of the last (hopefully current) Job - company_name, job_title
+        # Scraping of the last Job - company_name, job_title
         try:
-            current_job_company_name = a_tags.find_all('p')[1].get_text().strip()
-            current_job_title = a_tags.find('h3').get_text().strip()
+            last_job_company_name = a_tags.find_all('p')[1].get_text().strip()
+            last_job_title = a_tags.find('h3').get_text().strip()
 
             spans = a_tags.find_all('span')
         except:
-            current_job_company_name = a_tags.find_all('span')[1].get_text().strip()
-            current_job_title = exp_section.find('ul').find('li').find_all('span')[2].get_text().strip()
+            last_job_company_name = a_tags.find_all('span')[1].get_text().strip()
+            last_job_title = exp_section.find('ul').find('li').find_all('span')[2].get_text().strip()
 
             spans = exp_section.find('ul').find('li').find_all('span')
 
-        current_job_company_name = current_job_company_name.replace('Full-time', '').replace('Part-time', '').strip()
+        last_job_company_name = last_job_company_name.replace('Full-time', '').replace('Part-time', '').strip()
 
-        # Scraping of last (hopefully current) Job - location
-        location = Location()
+        # Scraping of last Job - location
+        last_job_location = Location()
         next_span_is_location = False
         for span in spans:
             if next_span_is_location:
-                location.parse_string(span.get_text().strip())
+                last_job_location.parse_string(span.get_text().strip())
                 break
             if span.get_text().strip() == 'Location':
                 next_span_is_location = True
 
-        # Scraping of Industry related to last (hopefully current) Job
-        company_url = a_tags.get('href')
-        if company_url not in industries_dict:
+        # Scraping of Industry related to last Job
+        last_job_company_url = a_tags.get('href')
+        if last_job_company_url not in industries_dict:
             try:
-                browser.get('https://www.linkedin.com' + company_url)
-                industries_dict[company_url] = browser.execute_script("return document.getElementsByClassName("
+                browser.get('https://www.linkedin.com' + last_job_company_url)
+                industries_dict[last_job_company_url] = browser.execute_script("return document.getElementsByClassName("
                                                                       "'org-top-card-summary-info-list__info-item')["
                                                                       "0].innerText")
             except:
-                industries_dict[company_url] = 'N/A'
+                industries_dict[last_job_company_url] = 'N/A'
 
-        current_job_company_industry = industries_dict[company_url]
+        last_job_company_industry = industries_dict[last_job_company_url]
 
-        company = Company(
-            name=current_job_company_name,
-            industry=current_job_company_industry
+        last_job = Job(
+            position=last_job_title,
+            company=Company(
+                name=last_job_company_name,
+                industry=last_job_company_industry
+            ),
+            location=last_job_location
         )
-        current_job = Job(
-            position=current_job_title,
-            company=company,
-            location=location
-        )
+
+        current_job = last_job if not job_history_summary.is_currently_unemployed else Job()
+
         profile = Profile(profile_name, email, skills, current_job, job_history_summary)
 
     else:
