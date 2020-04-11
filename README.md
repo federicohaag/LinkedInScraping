@@ -41,28 +41,28 @@ There are two ways you can run the code: headless execution and normal one.
 
 In both cases, be careful (especially when you scrap a lot of profiles) because your computer may enter sleep mode. In sleep mode the scraping could not work. For MacOS I suggest [Amphetamine](https://apps.apple.com/it/app/amphetamine/id937984704?mt=12).
 
-### Headless execution
-In this mode the script will do scraping without opening a real Chrome window.
-
-**Pros:** In this way you can keep on doing your regular business on your computer.
-
-**Cons:** If you scrap many profiles (more than hundreds) and/or in unusual times (in the night) LinkedIn may prompt a Captcha to check that you are not a human. If this happens, there is no way for you to fill in the Captcha. The script will detect the situation and terminate the scraping: you will have hence to run the script in normal mode, do the captcha, and then you can proceed in scraping the profiles that were left.
-
-To run in headless mode:
-```
-python scrap_profiles.py HEADLESS
-```
-
 ### Normal execution
 In this mode the script will do scraping opening a real Chrome window.
 
-**Pros:** In this case you will be able - if prompted - to satisfy the Captcha check and to proceed the scraping. The python script is trained on this situation and will perfectly manage it alerting you.
+**Pros:** In this case you will be able - if prompted - to satisfy the Captcha check and to proceed the scraping: the python script is trained on this situation and will perfectly manage it alerting you.
 
 **Cons:** Be aware that if you choose this mode you can not loose the focus on the window, otherwise no data will be scraped.
 
 To run in normal mode:
 ```
 python scrap_profiles.py
+```
+
+### Headless execution
+In this mode the script will do scraping without opening a real Chrome window.
+
+**Pros:** The scraping process is distributed into many threads to speed up to 4 times the performance. Moreover, in this way you can keep on doing your regular business on your computer as you don't have to keep the focus on any specific window.
+
+**Cons:** If you scrap many profiles (more than hundreds) and/or in unusual times (in the night) LinkedIn may prompt a Captcha to check that you are not a human. If this happens, there is no way for you to fill in the Captcha. The script will detect this particular situation and terminate the scraping with an alert: you will have hence to run the script in normal mode, do the captcha, and then you can proceed in scraping the profiles that were left.
+
+To run in headless mode:
+```
+python scrap_profiles.py HEADLESS
 ```
 
 ## Running Scraping by Profile URL
