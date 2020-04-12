@@ -93,7 +93,7 @@ delimiter = delimiter if not delimiter == "" else ":::"
 config.set('profiles_data', 'delimiter', delimiter)
 
 print("Insert the name of the .xlsx file that will contain the results of the scraping by profile url.")
-print("SLeave blank for default option (results_profiles.xlsx)")
+print("Leave blank for default option (results_profiles.xlsx)")
 print("> ", end="")
 output_file_name = input()
 output_file_name = output_file_name if not output_file_name == "" else "results_profiles.xlsx"
