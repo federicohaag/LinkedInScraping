@@ -155,10 +155,6 @@ You can also customize the code in many ways:
 
 If this code solves you a real problem, I would be grateful if you would consider a donation to enable me in keep on developing such codes. [Donate here](https://www.paypal.me/FedericoHaag).
 
-## Acknowledgments
-
-* Inspired by: [Repository Link](https://github.com/laxmimerit/LinkedIn-Profile-Scrapper-in-Python)
-
 ## Disclaimer
 
 The repository is intended to be used as a reference to learn more on Python and to perform scraping for personal usage. Every country has different and special regulations on usage of personal information, so I strongly recommend you to check your national legislation before using / sharing / selling / elaborating the scraped information. I decline any responsibility on the usage of scraped information. Cloning this repository and executing the included scripts you declare and confirm the responsibility of the scraped data usage is totally up on you.
