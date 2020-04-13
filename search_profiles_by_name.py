@@ -5,7 +5,7 @@ from configparser import ConfigParser
 import xlsxwriter
 from pyvirtualdisplay import Display
 from selenium import webdriver
-from utils import linkedin_login, message_to_user, get_options
+from utils import linkedin_login, message_to_user, get_browser_options
 
 waiting_time_to_load_page = 1
 waiting_time_to_load_results = 5
@@ -21,7 +21,7 @@ if config.get('system', 'os') == 'linux':
 headless_option = len(sys.argv) >= 2 and sys.argv[1] == 'HEADLESS'
 
 # Creation of a new instance of Chrome
-browser = webdriver.Chrome(executable_path=config.get('system', 'driver'), options=get_options(headless_option, config))
+browser = webdriver.Chrome(executable_path=config.get('system', 'driver'), options=get_browser_options(headless_option, config))
 
 # Doing login on LinkedIn
 linkedin_login(browser, config.get('linkedin', 'username'), config.get('linkedin', 'password'))

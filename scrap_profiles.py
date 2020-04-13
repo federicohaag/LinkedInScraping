@@ -14,7 +14,7 @@ headless_option = len(sys.argv) >= 2 and sys.argv[1] == 'HEADLESS'
 
 entries = []
 for entry in open(config.get('profiles_data', 'input_file_name'), "r"):
-    entries.append(entry)
+    entries.append(entry.strip())
 
 if len(entries) == 0:
     print("Please provide an input.")
@@ -23,14 +23,16 @@ if len(entries) == 0:
 if headless_option:
     grouped_entries = chunks(entries, len(entries) // int(config.get('system', 'max_threads')))
 else:
-    grouped_entries = entries
+    grouped_entries = [entries]
 
 if len(grouped_entries) > 1:
     print(f"Starting {len(grouped_entries)} parallel scrapers.")
+else:
+    print("Starting scraping...")
 
 scrapers = []
-for entries in grouped_entries:
-    scrapers.append(ProfileScraper(entries, config, headless_option))
+for entries_group in grouped_entries:
+    scrapers.append(ProfileScraper(len(scrapers)+1, entries_group, config, headless_option))
 
 for scraper in scrapers:
     scraper.start()
@@ -96,6 +98,7 @@ for i in range(len(scraping_results)):
 workbook.close()
 
 if any(scraper.interrupted for scraper in scrapers):
-    message_to_user("The scraping didnt end correctly due to Human Check. The excel file was generated but it will contain some entries reporting an error string.", config)
+    message_to_user("The scraping didnt end correctly due to Human Check. The excel file was generated but it will "
+                    "contain some entries reporting an error string.", config)
 else:
-    message_to_user('Scraping successfully ended', config)
+    message_to_user('Scraping successfully ended.', config)

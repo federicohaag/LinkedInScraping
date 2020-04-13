@@ -77,6 +77,8 @@ def linkedin_login(browser, username, password):
 
 
 def chunks(lst, n):
+    if n == 0:
+        return [lst]
     """Yield successive n-sized chunks from lst."""
     return [lst[i:i + n] for i in range(0, len(lst), n)]
 
@@ -127,7 +129,7 @@ def message_to_user(message, config):
         engine.runAndWait()
 
 
-def get_options(headless_option, config):
+def get_browser_options(headless_option, config):
 
     options = webdriver.ChromeOptions()
 

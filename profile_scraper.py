@@ -1,3 +1,4 @@
+import traceback
 from threading import Thread
 
 from pyvirtualdisplay import Display
@@ -8,7 +9,7 @@ from datetime import datetime
 import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from utils import linkedin_login, is_url_valid, HumanCheckException, message_to_user, get_options, linkedin_logout
+from utils import linkedin_login, is_url_valid, HumanCheckException, message_to_user, get_browser_options, linkedin_logout
 
 
 class ScrapingResult:
@@ -26,9 +27,13 @@ class ScrapingResult:
 
 class ProfileScraper(Thread):
 
-    def __init__(self, entries, config, headless_option):
+    def __init__(self, identifier, entries, config, headless_option):
 
         Thread.__init__(self)
+
+        self._id = identifier
+
+        print(f"Scraper #{self._id}: Setting up the browser environment...")
 
         self.entries = entries
 
@@ -41,7 +46,7 @@ class ProfileScraper(Thread):
 
         # Creation of a new instance of Chrome
         self.browser = webdriver.Chrome(executable_path=config.get('system', 'driver'),
-                                        options=get_options(headless_option, config))
+                                        options=get_browser_options(headless_option, config))
 
         self.industries_dict = {}
 
@@ -130,16 +135,9 @@ class ProfileScraper(Thread):
 
             # Get all the job positions
             try:
-                list_of_job_positions = self.browser.find_element_by_id('experience-section').find_elements_by_tag_name(
-                    'li')
+                job_positions = self.browser.find_element_by_id('experience-section').find_elements_by_tag_name('li')
             except:
-                list_of_job_positions = []
-
-            # Get job experiences (two different positions in Company X is considered one job experience)
-            try:
-                job_experiences = self.browser.find_elements_by_class_name('pv-profile-section__card-item-v2')
-            except:
-                job_experiences = []
+                job_positions = []
 
             # Parsing of the page html structure
             soup = BeautifulSoup(self.browser.page_source, 'lxml')
@@ -167,11 +165,11 @@ class ProfileScraper(Thread):
                 skills = []
 
             # Parsing the job positions
-            if len(list_of_job_positions) > 0:
+            if len(job_positions) > 0:
 
                 # Parse job positions to extract relative the data ranges
                 job_positions_data_ranges = []
-                for job_position in list_of_job_positions:
+                for job_position in job_positions:
 
                     # Get the date range of the job position
                     try:
@@ -244,8 +242,7 @@ class ProfileScraper(Thread):
                         last_job,
                         JobHistorySummary(
                             profile_known_graduation_date,
-                            job_positions_data_ranges,
-                            job_experiences
+                            job_positions_data_ranges
                         )
                     )
                 )
@@ -276,25 +273,31 @@ class ProfileScraper(Thread):
 
         delimiter = self.config.get('profiles_data', 'delimiter')
 
+        print(f"Scraper #{self._id}: Executing LinkedIn login...")
+
         # Doing login on LinkedIn
         linkedin_login(self.browser, self.config.get('linkedin', 'username'), self.config.get('linkedin', 'password'))
 
         start_time = time.time()
 
-        count = 1
+        count = 0
+
         for entry in self.entries:
 
-            # Print statistics about ending time of the script
+            count += 1
 
-            ending_in = time.strftime("%H:%M:%S",
-                                      time.gmtime(((time.time() - start_time) / count) * (len(self.entries) - count)))
-            print(f"Scraping profile {count} / {len(self.entries)} - {ending_in} left")
+            # Print statistics about ending time of the script
+            if count > 1:
+                time_left = ((time.time() - start_time) / count) * (len(self.entries) - count + 1)
+                ending_in = time.strftime("%H:%M:%S", time.gmtime(time_left))
+            else:
+                ending_in = "Unknown time"
+
+            print(f"Scraper #{self._id}: Scraping profile {count} / {len(self.entries)} - {ending_in} left")
 
             try:
                 linkedin_url, known_graduation_date = self.parse_entry(entry, delimiter)
-
                 scraping_result = self.scrap_profile(linkedin_url, known_graduation_date)
-
                 self.results.append(scraping_result)
 
             except CannotProceedScrapingException:
@@ -303,9 +306,9 @@ class ProfileScraper(Thread):
                 break
 
             except:
+                with open("errlog.txt", "a") as errlog:
+                    traceback.print_exc(file=errlog)
                 self.results.append(ScrapingResult('GenericError'))
-
-            count += 1
 
         # Closing the Chrome instance
         self.browser.quit()
@@ -313,5 +316,4 @@ class ProfileScraper(Thread):
         end_time = time.time()
         elapsed_time = time.strftime('%H:%M:%S', time.gmtime(end_time - start_time))
 
-        print(f"Scraping ended at {time.strftime('%H:%M:%S', time.gmtime(end_time))}")
-        print(f"Parsed {count}/{len(self.entries)} profiles in {elapsed_time}")
+        print(f"Scraper #{self._id}: Parsed {count} / {len(self.entries)} profiles in {elapsed_time}")
