@@ -26,11 +26,13 @@ browser = webdriver.Chrome(executable_path=config.get('system', 'driver'), optio
 # Doing login on LinkedIn
 linkedin_login(browser, config.get('linkedin', 'username'), config.get('linkedin', 'password'))
 
-message_to_user('Starting reading Linkedin profiles')
+message_to_user('Starting reading Linkedin profiles', config)
 
 results = []
+cont = 0
 for query in open(config.get('profiles_data_by_name', 'input_file_name'), "r"):
-
+    cont += 1
+    print(f"Scraping {cont}")
     query = query.split(config.get('profiles_data_by_name', 'delimiter'))
 
     first_name = query[0]
@@ -104,7 +106,7 @@ for query in open(config.get('profiles_data_by_name', 'input_file_name'), "r"):
 
                 search_results[i].click()
 
-                time.sleep(waiting_time_to_load_page)
+                time.sleep(5*waiting_time_to_load_page)
 
                 if 'com/in/' in browser.current_url:
 
@@ -130,21 +132,25 @@ for query in open(config.get('profiles_data_by_name', 'input_file_name'), "r"):
                         if education_constraints['university'] is None:
                             continue
 
+                        education_checked = False
+
                         if any(x in school_name for x in education_constraints['university']):
 
                             edu_info = education.find_element_by_class_name('pv-entity__degree-info').text
 
-                            education_checked = False
                             if education_constraints['course'] is not None:
                                 if any(x in edu_info.lower() for x in education_constraints['course']):
                                     education_checked = True
+                            else:
+                                education_checked = True
 
                             # Check if the graduation year known is equal to the one specified in LinkedIn
                             grad_check = 'NO_GRAD_CHECK'
                             if graduation_date is not None:
                                 graduation_year = '20' + graduation_date.split('/')[-1].strip()
                                 try:
-                                    education_dates = education.find_element_by_class_name('pv-entity__dates').text.split(' – ')
+                                    education_dates = education.find_element_by_class_name(
+                                        'pv-entity__dates').text.split(' – ')
                                     if graduation_year == education_dates[1].strip():
                                         grad_check = 'GRAD_CHECKED'
                                 except:
@@ -202,4 +208,4 @@ for r in results:
     xls_row += 1
 workbook.close()
 
-message_to_user('Search of profiles ended.')
+message_to_user('Search of profiles ended.', config)
