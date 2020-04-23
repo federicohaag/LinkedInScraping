@@ -169,7 +169,7 @@ for query in open(config.get('profiles_data_by_name', 'input_file_name'), "r"):
             if 'Unable to locate element: {"method":"css selector","selector":".search-global-typeahead__input"}' in e.__str__():
                 needToLoop = True
 
-                message_to_user('Please execute manual check')
+                message_to_user('Please execute manual check', config)
 
                 time.sleep(10)
             else:
