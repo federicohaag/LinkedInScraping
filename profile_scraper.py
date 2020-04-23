@@ -74,6 +74,9 @@ class ProfileScraper(Thread):
             profile_linkedin_url = entry
             profile_known_graduation_date = None
 
+        if not profile_linkedin_url[-1] == '/':
+            profile_linkedin_url += '/'
+
         return profile_linkedin_url, profile_known_graduation_date
 
     def scrap_profile(self, profile_linkedin_url, profile_known_graduation_date):
@@ -264,7 +267,6 @@ class ProfileScraper(Thread):
 
             while self.browser.current_url != 'https://www.linkedin.com/feed/':
                 message_to_user('Please execute manual check', self.config)
-
                 time.sleep(30)
 
             return self.scrap_profile(profile_linkedin_url, profile_known_graduation_date)
