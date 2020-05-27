@@ -1,6 +1,6 @@
 # LinkedIn Scraping with Python
 
-Creates an Excel file containing personal data and last job position of specified people.
+Create an Excel file containing personal data and last job position of specified people.
 
 If you know the graduation date of the person, you can also specify it in the input file to obtain statistics about how fast he/she got a job after graduation.
 
@@ -146,8 +146,8 @@ Here some tips:
 You can customize the configurations easily re-running `configurator.py`.
 
 You can also customize the code in many ways:
-*The easy one is changing the order how the data is inserted in the excel file, or renaming the excel file headers.
-*The harder one is to do scraping of additional data: have a look at the Acknowledgments down here or feel free to reach me out to propose new code.
+* The easy one is changing the order how the data is inserted in the excel file, or renaming the excel file headers.
+* The harder one is to do scraping of additional data: have a look at the Acknowledgments down here or feel free to reach me out to propose new code.
 
 ## Authors
 
