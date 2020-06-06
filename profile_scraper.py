@@ -9,6 +9,7 @@ from datetime import datetime
 import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 from utils import linkedin_login, is_url_valid, HumanCheckException, message_to_user, get_browser_options, linkedin_logout
 
 
@@ -45,8 +46,7 @@ class ProfileScraper(Thread):
             self.display.start()
 
         # Creation of a new instance of Chrome
-        self.browser = webdriver.Chrome(executable_path=config.get('system', 'driver'),
-                                        options=get_browser_options(headless_option, config))
+        self.browser = webdriver.Chrome(ChromeDriverManager().install())
 
         self.industries_dict = {}
 
