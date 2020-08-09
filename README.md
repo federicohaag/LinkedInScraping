@@ -44,7 +44,7 @@ In this mode the script will do scraping opening a real Chrome window.
 
 To run in normal mode:
 ```
-python scrap_profiles.py
+python do_scraping.py
 ```
 
 ### Headless execution
@@ -56,75 +56,23 @@ In this mode the script will do scraping without opening a real Chrome window.
 
 To run in headless mode:
 ```
-python scrap_profiles.py HEADLESS
+python do_scraping.py HEADLESS
 ```
-
-## Running Scraping by Profile URL
-
-Open the file `profiles_data.txt` and insert the URLs of the LinkedIn profiles you want to do the scraping.
-
-**Notice:** Each line must contain **only one** URL
-
-If you want also the graduation statistics, append to the url the graduation date with format DD/MM/YY, using the `:::` delimiter.
-
-Run `scrap_profiles.py`.
 
 ### Examples
 
-Only LinkedIn URL:
+LinkedIn URLs:
 ```
 https://www.linkedin.com/in/federicohaag/
 https://www.linkedin.com/in/someoneelse/
 ```
 
-LinkedIn URL and KnownGraduationDate:
-```
-https://www.linkedin.com/in/federicohaag/:::01/10/2018
-https://www.linkedin.com/in/someoneelse/:::01/10/2018
-```
-
 When the Chrome page closes, it means the program ended.
 You can find inside the `LinkedInScraping` folder the extracted data in the results file `results_profiles.xlsx`.
-The file name will contain concatenated the current timestamp if the configuration was set as suggested.
+The filename will get concatenated to the current timestamp if the configuration was set as suggested.
 
-## Running Search for profile url by name
-
-Open the input file `profiles_names.txt` and insert data as follows:
-```
-FirstName:::LastName:::KnownUniversity:::KnownCourse:::KnownGraduationDate
-```
-
-Run `scrap_profiles_by_name.py`.
-
-### Input structure:
-* `FirstName` and `LastName` are required. If not provided the code will break.
-* `KnownUniversity` [optional] can be a single name or a sequence of names using `,` as delimiter.
-* `KnownCourse` [optional] can be a single name or a sequence of names using `,` as delimiter.
-* `KnownGraduationDate` [optional] has to be formatted as DD/MM/YY.
-
-The script will do its best to find a LinkedIn Profile that is consistent with the specified information.
-
-**Notice:** The optional parameters has to be inserted in order. This means that you can insert in a row just `FirstName:::LastName`, you can insert just `FirstName:::LastName:::KnownUniversity`, but you can not insert something like `FirstName:::LastName:::KnownCourse`.
-
-### Example:
-Let's say you want to look for Federico Haag profile, you know he is a student of Politecnico di Milano but you don't know if he studies computer science or management engineering. You also know he graduated around the 01/10/2018 (only the year is relevant).
-Here is what guarantee you the best match.
-```
-Federico:::Haag:::Politecnico di Milano:::Computer Science,Management:::01/10/2018
-```
-
-### Results schema:
-* **Education Checked** is `TRUE` if the university & course information of the found LinkedIn Profile are consistent with the provided ones.
-* **Checked Status** can be `GRAD_CHECKED` if the graduation year of the found LinkedIn Profile is consistent with the provided one, `NO_GRAD_CHECK` otherwise.
 
 ## Common problems in Running
-
-### Selenium WebDriverException
-In case you get an error message similar to the following:
-```
-selenium.common.exceptions.WebDriverException: Message: unknown error: cannot find Chrome binary
-```
-please run again `configurator.py` and be sure to specify a correct path to your chrome.exe executable in Windows or the chrome folder in Linux.
 
 ### Human check freezing the scraping
 It may happen that while scraping the script will warn you about the need to perform a Human Check (a Google Captcha) even if it's not prompted for real.
@@ -146,8 +94,6 @@ You can also customize the code in many ways:
 ## Authors
 
 * **Federico Haag** - [LinkedIn](https://www.linkedin.com/in/federicohaag/) - [Medium](https://medium.com/@federicohaag)
-
-If this code solves you a real problem, I would be grateful if you would consider a donation to enable me in keep on developing such codes. [Donate here](https://www.paypal.me/FedericoHaag).
 
 ## Disclaimer
 

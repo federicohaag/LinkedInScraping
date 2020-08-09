@@ -13,7 +13,7 @@ config = ConfigParser()
 config.read('config.ini')
 
 # Setting the execution mode
-headless_option = len(sys.argv) >= 2 and sys.argv[1] == 'HEADLESS'
+headless_option = len(sys.argv) >= 2 and sys.argv[1].upper() == 'HEADLESS'
 
 # Loading of input data (LinkedIn Urls)
 profiles_urls = []
@@ -29,7 +29,8 @@ if len(profiles_urls) == 0:
 s = Scraper(
     linkedin_username=config.get('linkedin', 'username'),
     linkedin_password=config.get('linkedin', 'password'),
-    profiles_urls=profiles_urls
+    profiles_urls=profiles_urls,
+    headless=headless_option
 )
 
 s.start()
@@ -40,7 +41,7 @@ scraping_results = s.results
 
 # Generation of XLS file with profiles data
 output_file_name = config.get('profiles_data', 'output_file_name')
-if config.get('profiles_data', 'append_timestamp') == 'Y':
+if config.get('profiles_data', 'append_timestamp').upper() == 'Y':
     output_file_name_split = output_file_name.split('.')
     output_file_name = "".join(output_file_name_split[0:-1]) + "_" + str(int(time.time())) + "." + \
                        output_file_name_split[-1]
@@ -65,9 +66,11 @@ for i in range(len(scraping_results)):
         data = [
             p.name,
             p.email,
-            ",".join(p.skills),
-            json.dumps(p.jobs.reprJSON(), cls=ComplexEncoder)
+            ",".join(p.skills)
         ]
+
+        for job in p.jobs:
+            data.append(json.dumps(job.reprJSON(), cls=ComplexEncoder))
 
     for j in range(len(data)):
         worksheet.write(i + 1, j, data[j])
