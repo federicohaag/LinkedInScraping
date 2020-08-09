@@ -50,22 +50,34 @@ class Scraper(Thread):
 
         for linkedin_url in self.profiles_urls:
 
-            try:
-                profile = self.scrape_profile(linkedin_url)
-
-            except HumanCheckException:
-                profile = None
-                # TODO: Implement here Human Check Solver
-
-            except ScrapingException:
-                profile = None
-
-            self.results.append(ScrapingResult(linkedin_url, profile))
+            self.results.append(
+                ScrapingResult(
+                    linkedin_url,
+                    self.scrape_profile(linkedin_url)
+                )
+            )
 
         # Closing the Chrome instance
         self.browser.quit()
 
-    def scrape_profile(self, profile_linkedin_url):
+    def scrape_profile(self, linkedin_url, waiting_time=10):
+
+        try:
+            profile = self.__scrape_profile(linkedin_url)
+
+        except HumanCheckException:
+            print("Please solve the captcha.")
+            print("Another try will be performed within 10 seconds...")
+            time.sleep(waiting_time)
+
+            profile = self.scrape_profile(linkedin_url, int(waiting_time*1.5))
+
+        except ScrapingException:
+            profile = None
+
+        return profile
+
+    def __scrape_profile(self, profile_linkedin_url):
 
         if not is_url_valid(profile_linkedin_url):
             raise ScrapingException
