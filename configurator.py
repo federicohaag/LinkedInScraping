@@ -53,5 +53,5 @@ with open('config.ini', 'w') as f:
 
 print("")
 print("Configuration completed. You can now do scraping.")
-print("To scrape profile by url: execute scrap_profiles.py")
+print("To scrape profile by url: execute do_scraping.py")
 print("To search profiles by name: execute search_profiles_by_name.py")
