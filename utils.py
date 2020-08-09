@@ -1,9 +1,16 @@
+import json
 import re
-import pyttsx3
-from datetime import datetime
-from selenium import webdriver
+import time
 
-from job_history_summary import JobHistorySummary
+
+class AuthenticationException(Exception):
+    """"""
+    pass
+
+
+class ScrapingException(Exception):
+    """"""
+    pass
 
 
 class HumanCheckException(Exception):
@@ -17,70 +24,71 @@ class CannotProceedScrapingException(Exception):
 
 
 class Location:
-    def __init__(self, city='N/A', country='N/A', location='N/A'):
-        self.full_string = location
-        self.city = city
-        self.country = country
+    def __init__(self, location: str):
+        self.location = location
+        self.city = ''
+        self.country = ''
 
-    def parse_string(self, location):
-        self.full_string = location
         if ',' in location:
-            # TODO: Probably useless try - except. To be checked.
             try:
-                self.city = location.split(',')[0]
-                self.country = location.split(',')[-1]
+                self.city = location.split(',')[0].strip()
+                self.country = location.split(',')[-1].strip()
             except:
                 pass
 
+    def reprJSON(self):
+        return dict(location=self.location, city=self.city, country=self.country)
+
 
 class Company:
-    def __init__(self, name='N/A', industry='N/A'):
+    def __init__(self, name: str, industry: str, employees: str):
         self.name = name
         self.industry = industry
+        self.employees = employees
+
+    def reprJSON(self):
+        return dict(name=self.name, industry=self.industry, employees=self.employees)
 
 
 class Job:
-    def __init__(self, company=Company(), position='N/A', location=Location()):
-        self.company = company
+    def __init__(self, position: str, company: Company, location: Location, date_range: str):
         self.position = position
+        self.company = company
         self.location = location
+        self.date_range = date_range
 
-    def __set__(self, instance, value):
-        self.instance = value
+    def reprJSON(self):
+        return dict(position=self.position, company=self.company, location=self.location, date_range=self.date_range)
 
 
 class Profile:
-    def __init__(self, profile_name, email, skills, last_job=Job(), job_history_summary=JobHistorySummary()):
-        self.profile_name = profile_name
+    def __init__(self, name: str, email: str, skills: [str], jobs: [Job]):
+        self.name = name
         self.email = email
         self.skills = skills
-        self.current_job = last_job if not job_history_summary.is_currently_unemployed else Job()
-        self.jobs_history = job_history_summary
+        self.jobs = jobs
+
+    def reprJSON(self):
+        return dict(name=self.name, email=self.email, skills=self.skills, jobs=self.jobs)
 
 
-def linkedin_logout(browser):
-    browser.get('https://www.linkedin.com/m/logout')
+class ScrapingResult:
+    def __init__(self, linkedin_url: str, profile: Profile):
+        self.linkedin_url = linkedin_url
+        self.profile = profile
 
+    def reprJSON(self):
+        return dict(linkedin_url=self.linkedin_url, profile=self.profile)
 
-def linkedin_login(browser, username, password):
-    browser.get('https://www.linkedin.com/uas/login')
+    def is_error(self):
+        return self.profile is None
 
-    username_input = browser.find_element_by_id('username')
-    username_input.send_keys(username)
-
-    password_input = browser.find_element_by_id('password')
-    password_input.send_keys(password)
-    try:
-        password_input.submit()
-    except:
-        pass
-
-
-def chunks(lst, n):
-    if n == 0:
-        return [lst]
-    """Yield successive n-sized chunks from lst."""
-    return [lst[i:i + n] for i in range(0, len(lst), n)]
+class ComplexEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if hasattr(obj, 'reprJSON'):
+            return obj.reprJSON()
+        else:
+            return json.JSONEncoder.default(self, obj)
 
 
 def is_url_valid(url):
@@ -95,7 +103,6 @@ def is_url_valid(url):
 
 
 def get_months_between_dates(date1, date2):
-
     if date1 < date2:
         diff = date2 - date1
     elif date1 > date2:
@@ -106,41 +113,9 @@ def get_months_between_dates(date1, date2):
     return diff.days // 30
 
 
-def boolean_to_string_xls(boolean_value):
-    if boolean_value is None:
-        return 'N/A'
-
-    return 'X' if boolean_value else ''
+def wait_for_loading():
+    time.sleep(2)
 
 
-def date_to_string_xls(date):
-    if date is None:
-        return 'N/A'
-
-    return datetime.strftime(date, "%b-%y")
-
-
-def message_to_user(message, config):
-    print(message)
-
-    if config.get('system', 'speak') == 'Y':
-        engine = pyttsx3.init()
-        engine.say(message)
-        engine.runAndWait()
-
-
-def get_browser_options(headless_option, config):
-
-    options = webdriver.ChromeOptions()
-
-    options.add_argument('--no-sandbox')
-
-    if headless_option:
-        options.add_argument('--headless')
-
-    options.add_argument('--disable-dev-shm-usage')
-
-    if not config.get('system', 'chrome_path') == '':
-        options.binary_location = r"" + config.get('system', 'chrome_path')
-
-    return options
+def wait_for_scrolling():
+    time.sleep(1)

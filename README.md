@@ -2,19 +2,15 @@
 
 Create an Excel file containing personal data and last job position of specified people.
 
-If you know the graduation date of the person, you can also specify it in the input file to obtain statistics about how fast he/she got a job after graduation.
-
-Scraping can be currently done only providing the LinkedIn profile url of the target person. If you dont have yet the LinkedIn profile url, you can make it to be searched automatically (see below).
+Scraping can be currently done only providing the LinkedIn profile url of the target person. If you don't have yet the LinkedIn profile urls, see below how to "Automatically get LinkedIn Profiles Urls".
 
 Doubts? Reach me out on [LinkedIn](https://www.linkedin.com/in/federicohaag/).
 
-If this code solves you a real problem, I would be grateful if you would consider a donation to enable me in keep on developing such codes. [Donate here](https://www.paypal.me/FedericoHaag).
-
 ## Prerequisites
 
-You must have installed in your machine (higher versions are fine):
-* Google Chrome v.80
-* Python 3.8
+You must have installed in your machine:
+* Google Chrome (last version)
+* Python (last version)
 
 
 ## Installing
@@ -23,17 +19,15 @@ These instructions will get you a copy of the project up and running on your loc
 
 1. Download the whole repository.
 2. Place the directory `LinkedinScraping` in your python environment.
-3. From inside the directory `LinkedinScraping` run the following:
+3. Navigate to the directory `LinkedinScraping` and run the following:
 ```
 pip install -r requirements.txt
 ```
- 4. Run `LinkedinScraping\configurator.py` following the prompted instructions.
+4. Run `LinkedinScraping\configurator.py` following the prompted instructions.
  
 
-If it's the first time, set the configuration as suggested by the messages that will be printed by the configurator.
-In any time in the future you can easily re-run the configuration to change for example name of input / output files or delimiters.
-
-I understand the request for LinkedIn username and password could be scary, unfortunately it is necessary. I can guarantee you such information is stored only locally: no personal data is sent to me or anywhere else, except obviously to the Linkedin page to perform the login. You are free to check the code to be sure of this.
+If this is the first time, choose the suggested configuration.
+In any time in the future you can easily run again the configuration to apply changes.
 
 ## Executing
 
