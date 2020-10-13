@@ -160,10 +160,15 @@ class Scraper(Thread):
                 "[position, company_name, company_url, date_ranges, job_location]);     }   } } return jobs; })();")
         except WebDriverException:
             jobs = []
-
+            
+        clean_jobs = []
+        for job in jobs: 
+            if job[2] != '':
+                clean_jobs.append(job)
+                
         parsed_jobs = []
 
-        for job in jobs:
+        for job in clean_jobs:
             company_industry, company_employees = self.scrape_company_details(job[2])
 
             parsed_jobs.append(
