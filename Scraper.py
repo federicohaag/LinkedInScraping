@@ -165,8 +165,6 @@ class Scraper(Thread):
         for job in jobs: 
             if job[2] != '':
                 clean_jobs.append(job)
-            elif job[2] == '': 
-                clean_jobs.append(['Fake', 'Fake', 'https://www.linkedin.com/company/linkedin/', '', ''])
                 
         parsed_jobs = []
 
