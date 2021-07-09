@@ -45,8 +45,13 @@ class Scraper(Thread):
 
         if not self.browser.current_url == "https://www.linkedin.com/feed/":
             print(self.browser.current_url)
-            time.sleep(40)
-            raise AuthenticationException()
+            # Get past the remember me prompt
+            if self.browser.current_url == "https://www.linkedin.com/checkpoint/lg/login-submit":
+                remember = self.browser.find_element_by_id("remember-me-prompt__form-primary")
+                remember.submit()
+            else:
+                time.sleep(40)
+                raise AuthenticationException()
 
         for linkedin_url in self.profiles_urls:
 
